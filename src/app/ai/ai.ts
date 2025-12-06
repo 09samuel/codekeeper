@@ -1,9 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { NotificationService } from '../services/notification-service';
 
 @Component({
   selector: 'app-ai',
@@ -17,7 +18,8 @@ export class Ai {
   response = signal('');
   isLoading = signal(false);
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
+  private notificationService = inject(NotificationService);
 
   async sendPrompt() {
     if (!this.prompt().trim()) return;
@@ -40,11 +42,21 @@ export class Ai {
       }
       
     } catch (error: any) {
-      const errorMsg = error?.error?.error || 'Failed to get AI response. Please try again.';
+      let errorMsg = 'Failed to get AI response. Please try again.';
+      
+      if (error.error) {
+        // Server returned an error response
+        errorMsg = error.error.error || error.error.details || error.error.message || errorMsg;
+      } else if (error.message) {
+        // Client-side or network error
+        errorMsg = error.message;
+      }
       this.response.set(`Error: ${errorMsg}`);
+      this.notificationService.error(errorMsg); 
       console.error('AI generation error:', error);
-    } finally {
-      this.isLoading.set(false);
+    }
+    finally {
+          this.isLoading.set(false);
     }
   }
 
