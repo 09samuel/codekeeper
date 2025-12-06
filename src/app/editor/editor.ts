@@ -139,7 +139,7 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
 
     if (this.documentId && this.provider && this.ydoc) {
       this.docService.getDocumentPermission(this.documentId).subscribe({
-        next: (res) => {
+        next: async (res) => { 
           console.log('📋 Initial permission from backend:', res.permission);
           this.userPermission = res.permission;
 
@@ -147,23 +147,23 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
             this.userPermission = 'edit';
           }
           
-          setTimeout(() => {
-            this.initEditor();
-            this.subscribeToPermissionChanges();
-          }, 0);
+          // AWAIT editor initialization
+          await this.initEditor();
+          
+          // subscribe AFTER editor is ready
+          this.subscribeToPermissionChanges();
         },
-        error: (err) => {
+        error: async (err) => { 
           console.error('❌ Error fetching initial permission:', err);
           this.userPermission = 'view';
           
-          setTimeout(() => {
-            this.initEditor();
-            this.subscribeToPermissionChanges();
-          }, 0);
+          await this.initEditor();
+          this.subscribeToPermissionChanges();
         }
       });
     }
   }
+
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['documentId'] && !changes['documentId'].firstChange) {
@@ -174,17 +174,15 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
       
       if (this.documentId && this.provider && this.ydoc) {
         this.docService.getDocumentPermission(this.documentId).subscribe({
-          next: (res) => {
+          next: async (res) => {  
             this.userPermission = res.permission;
-
+            
             if (this.currentUserId === this.documentOwner?._id) {
               this.userPermission = 'edit';
             }
 
-            setTimeout(() => {
-              this.initEditor();
-              this.subscribeToPermissionChanges();
-            }, 0);
+            await this.initEditor(); 
+            this.subscribeToPermissionChanges();
           },
           error: (err) => {
             console.error('❌ Error fetching permission:', err);
@@ -355,68 +353,73 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
     this.undoManager = null;
   }
 
- private initEditor() {
-  this.ytext = this.ydoc.getText('codemirror');
-  this.undoManager = new Y.UndoManager(this.ytext);
+  
 
-  const finish = () => {
-    this.createEditor();
-    this.initialized.emit(); 
-  };
+  private async initEditor(): Promise<void> {
+    return new Promise((resolve) => {
+      this.ytext = this.ydoc.getText('codemirror');
+      this.undoManager = new Y.UndoManager(this.ytext);
 
-  if (this.content && this.ytext.length === 0) {
-    this.ytext.insert(0, this.content);
-    finish();
-  } else if (this.ytext.length === 0) {
-    this.docService.getDocumentSignedUrl(this.documentId).subscribe({
-      next: (res) => {
-        if (res.url) {
-          fetch(res.url)
-            .then(r => {
-              if (!r.ok) {
-                throw new Error(`S3 fetch failed: ${r.status} ${r.statusText}`);
-              }
-              return r.text();
-            })
-            .then(content => {
-              // 🔥 ADD THIS CHECK - Detect S3 XML error responses
-              if (content.trim().startsWith('<?xml') && content.includes('<Error>')) {
-                console.error('❌ S3 returned an error response:', content);
-                throw new Error('File not found in S3');
-              }
+      const finish = () => {
+        this.createEditor();
+        this.initialized.emit();
+        resolve(); // ✅ Resolve when editor is fully ready
+      };
 
-              const setInitialContent = () => {
-                if (this.ytext!.length === 0 && content) {
-                  this.ytext!.insert(0, content);
+    if (this.content && this.ytext.length === 0) {
+      this.ytext.insert(0, this.content);
+      finish();
+    } else if (this.ytext.length === 0) {
+      this.docService.getDocumentSignedUrl(this.documentId).subscribe({
+        next: (res) => {
+          if (res.url) {
+            fetch(res.url)
+              .then(r => {
+                if (!r.ok) {
+                  throw new Error(`S3 fetch failed: ${r.status} ${r.statusText}`);
                 }
-                finish();
-              };
+                return r.text();
+              })
+              .then(content => {
+                // 🔥 ADD THIS CHECK - Detect S3 XML error responses
+                if (content.trim().startsWith('<?xml') && content.includes('<Error>')) {
+                  console.error('❌ S3 returned an error response:', content);
+                  throw new Error('File not found in S3');
+                }
 
-              if (this.provider.synced) {
-                setInitialContent();
-              } else {
-                this.provider.once('sync', setInitialContent);
-              }
-            })
-            .catch(err => {
-              console.error('❌ Error loading document:', err);
-              this.showNotification('Document file not found. Starting with empty document.');
-              this.loadError.emit();
-              finish(); // Create empty editor
-            });
-        } else {
+                const setInitialContent = () => {
+                  if (this.ytext!.length === 0 && content) {
+                    this.ytext!.insert(0, content);
+                  }
+                  finish();
+                };
+
+                if (this.provider.synced) {
+                  setInitialContent();
+                } else {
+                  this.provider.once('sync', setInitialContent);
+                }
+              })
+              .catch(err => {
+                console.error('❌ Error loading document:', err);
+                this.showNotification('Document file not found. Starting with empty document.');
+                this.loadError.emit();
+                finish(); // Create empty editor
+              });
+          } else {
+            finish();
+          }
+        },
+        error: (err) => {
+          console.error('❌ Error getting signed URL:', err);
+          this.loadError.emit();
           finish();
         }
-      },
-      error: (err) => {
-        console.error('❌ Error getting signed URL:', err);
-        this.loadError.emit();
-        finish();
-      }
+      });
+    } else {
+      finish();
+    }
     });
-  } else {
-    finish();
-  }
 }
 
   private createEditor() {
