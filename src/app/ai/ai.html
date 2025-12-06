@@ -1,0 +1,50 @@
+<div class="flex flex-col h-full gap-4">
+  <!-- Header -->
+  <div class="flex justify-between items-center">
+    <div>
+      <h3 class="text-white font-medium">AI Coding Assistant</h3>
+    </div>
+    <button 
+      (click)="clearChat()"
+      class="px-3 py-1 text-sm text-[#858585] hover:text-white transition-colors">
+      Clear
+    </button>
+  </div>
+
+  <!-- Prompt Textarea -->
+  <div class="flex flex-col flex-1">
+    <label class="text-white text-sm font-medium mb-2">Your Question</label>
+    <textarea 
+      [(ngModel)]="prompt"
+      placeholder="Ask anything... (e.g., 'Explain this code', 'How do I fix this error?', 'Generate a function for...')"
+      class="flex-1 w-full p-3 bg-[#1e1e1e] text-white border border-[#333333] rounded-md 
+             focus:outline-none focus:border-[#007acc] resize-none font-mono text-sm"
+      [disabled]="isLoading()"
+      (keydown.ctrl.enter)="sendPrompt()">
+    </textarea>
+  </div>
+
+  <!-- Send Button -->
+  <button 
+    (click)="sendPrompt()"
+    [disabled]="!prompt().trim() || isLoading()"
+    class="px-4 py-2 bg-[#007acc] text-white rounded-md hover:bg-[#005a9e] 
+           disabled:bg-[#333333] disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
+    @if (isLoading()) {
+      <span class="animate-spin">⟳</span>
+    }
+    <span>{{ isLoading() ? 'Generating...' : 'Send Prompt' }}</span>
+  </button>
+
+  <!-- Response Textarea -->
+  <div class="flex flex-col flex-1">
+    <label class="text-white text-sm font-medium mb-2">AI Response</label>
+    <textarea 
+      [value]="response()"
+      readonly
+      placeholder="AI response will appear here..."
+      class="flex-1 w-full p-3 bg-[#1e1e1e] text-[#d4d4d4] border border-[#333333] rounded-md 
+             resize-none font-mono text-sm whitespace-pre-wrap">
+    </textarea>
+  </div>
+</div>

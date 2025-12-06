@@ -1,0 +1,182 @@
+<div class="flex flex-col h-screen overflow-hidden">
+  <!-- Collaboration Overlay - Fixed top right -->
+<div class="collaboration-overlay">
+  <div class="flex items-center gap-2">
+    <!-- Avatar stack -->
+    <div class="flex items-center -space-x-2">
+      @for (user of activeUsers.slice(0, 3); track user.id; let i = $index) {
+        <div class="avatar-circle group"
+             [style.z-index]="activeUsers.length - i"
+             [title]="user.name">
+          <img [src]="user.avatar" 
+               [alt]="user.name"
+               class="w-full h-full object-cover">
+          <!-- Enhanced tooltip -->
+          <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            {{ user.name }}
+            <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black"></div>
+          </div>
+        </div>
+      }
+      @if (activeUsers.length > 3) {
+        <div class="avatar-circle avatar-more group"
+             [style.z-index]="0"
+             [title]="getRemainingUsersTooltip()">
+          +{{ activeUsers.length - 3 }}
+          <!-- Enhanced tooltip for more users -->
+          <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            {{ getRemainingUsersTooltip() }}
+            <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black"></div>
+          </div>
+        </div>
+      }
+    </div>
+    
+    <!-- User count badge -->
+    @if (activeUsers.length > 0) {
+      <div class="text-xs text-[#858585] ml-2">
+        {{ activeUsers.length }} user{{ activeUsers.length !== 1 ? 's' : '' }} online
+      </div>
+    }
+  </div>
+</div>
+  
+  <!-- Tab Bar -->
+  <div class="flex items-center bg-[#252526] border-b border-[#1e1e1e] overflow-x-auto flex-shrink-0 custom-scrollbar">
+    <div class="flex min-w-max">
+      @for (tab of tabs; track tab.id) {
+        <div 
+          (click)="selectTab(tab.id)"
+          [class.bg-[#1e1e1e]]="tab.isActive"
+          [class.bg-[#2d2d2d]]="!tab.isActive"
+          class="flex items-center gap-2 px-3 py-2 border-r border-[#1e1e1e] cursor-pointer hover:bg-[#2a2a2a] min-w-[120px] max-w-[200px]">
+          <span class="text-sm text-[#cccccc] truncate">{{ tab.title }}</span>
+          <button 
+            (click)="closeTab($event, tab.id)"
+            class="ml-auto p-0.5 hover:bg-[#3e3e42] rounded">
+            <mat-icon class="!text-base text-[#858585] hover:text-white">close</mat-icon>
+          </button>
+        </div>
+      }
+      @if (tabs.length === 0) {
+        <div class="text-sm text-[#858585] p-2 min-w-max">No files open</div>
+      }
+    </div>
+  </div>
+
+  <!-- Main Content Area (Sidebar + Panel + Editor) -->
+  <div class="flex flex-1 min-h-0">
+    
+    <!-- Sidebar -->
+    <aside class="w-12 bg-[#181818] flex flex-col justify-between items-center py-4 border-r border-[#2d2d2d] flex-shrink-0">
+      <!-- Top icons group -->
+      <div class="flex flex-col items-center space-y-2">
+        @for (icon of icons.slice(0, -1); track icon.name) {
+          <button
+            class="w-12 h-12 flex items-center justify-center hover:bg-[#2a2a2a] transition-colors relative"
+            [class.text-white]="selectedPanel === icon.name && !isPanelCollapsed"
+            [class.text-[#858585]]="selectedPanel !== icon.name || isPanelCollapsed"
+            [class.border-r-6]="selectedPanel === icon.name && !isPanelCollapsed"
+            [class.border-[#007acc]]="selectedPanel === icon.name && !isPanelCollapsed"
+            (click)="selectPanel(icon.name)">
+            <mat-icon>{{ icon.icon }}</mat-icon>
+          </button>
+        }
+      </div>
+
+      <!-- Bottom icon (logout) -->
+      <button class="w-12 h-12 flex items-center justify-center rounded hover:bg-[#2a2a2a] transition-colors relative text-[#858585]"
+           (click)="logout()">   
+        <mat-icon>{{ icons[icons.length - 1].icon }}</mat-icon>
+      </button>
+    </aside>
+
+    <!-- Sidebar Panel -->
+    <div class="sidebar-panel bg-[#252526] border-r border-[#1e1e1e] flex flex-col overflow-hidden transition-all"
+        [class.collapsed]="isPanelCollapsed">
+      @if (!isPanelCollapsed) {
+        @switch (selectedPanel) {
+          @case ('files') {
+            <app-files class="flex flex-col flex-1" (fileSelected)="onFileSelected($event)"   (fileDeleted)="onFileDeleted($event)" (fileRenamed)="onFileRenamed($event)"></app-files>">
+          }
+          
+          @case ('chat') {
+            <div class="animate-fade-in p-4">
+              <h2 class="text-lg font-bold text-white">Users</h2>
+              <p class="text-[#858585]">List of users</p>
+            </div>
+          }
+          
+          @case ('run') {
+            <app-code-runner [editorContent]="getEditorContent()" class="flex flex-col flex-1 p-4"></app-code-runner>
+          }
+
+          @case ('ai') {
+            <app-ai class="flex flex-col flex-1 p-4"></app-ai>
+          }
+
+          
+        
+          @case ('settings') {
+            <div class="animate-fade-in p-4">
+              <h2 class="text-lg font-bold text-white">Settings</h2>
+              <p class="text-[#858585]">Configure your workspace</p>
+            </div>
+          }
+
+          @case ('draw') {
+            <div class="animate-fade-in p-4">
+              <h2 class="text-lg font-bold text-white">Draw</h2>
+              <p class="text-[#858585]">Whiteboard</p>
+            </div>
+          }
+          
+          @default {
+            <div class="animate-fade-in p-4">
+              <p class="text-[#858585]">Select an icon to see content</p>
+            </div>
+          }
+        }
+      }
+    </div>
+
+    <!-- Editor Area -->
+    <main class="flex-1 bg-[#1e1e1e] overflow-auto custom-scrollbar min-h-0 min-w-0">
+      @if (activeTab) {
+        <div class="w-full h-full min-h-0 min-w-0 overflow-auto custom-scrollbar relative">
+          
+          <!-- Loader overlay -->
+          @if (isEditorLoading) {
+            <div class="absolute inset-0 flex items-center justify-center bg-[#1e1e1e]/80 z-20">
+              <div class="flex flex-col items-center gap-3">
+                <mat-icon class="!text-4xl text-[#cccccc] animate-spin">autorenew</mat-icon>
+                <p class="text-sm text-[#cccccc]">Loading editor…</p>
+              </div>
+            </div>
+          }
+
+          <!-- Editor only when provider + ydoc exist -->
+          <app-editor *ngIf="activeTab && currentProvider && currentYDoc"
+                      [documentId]="activeTab.documentId"
+                      [provider]="currentProvider"
+                      [ydoc]="currentYDoc"
+                      [title]="activeTab.title"
+                      [documentOwner]="documentOwner"
+                      (initialized)="onEditorInitialized()"
+                      (loadError)="onEditorLoadError()">
+          </app-editor>
+        </div>
+      } @else {
+        <!-- Empty Editor State -->
+        <div class="h-full flex flex-col items-center justify-center text-[#858585]">
+          <mat-icon class="!text-6xl mb-4">code</mat-icon>
+          <p class="text-lg mb-2">No file selected</p>
+          <p class="text-sm">Select a file from the sidebar to start editing</p>
+        </div>
+      }
+    </main>
+
+
+  </div>
+  
+</div>

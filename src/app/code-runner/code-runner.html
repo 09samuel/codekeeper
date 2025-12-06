@@ -1,0 +1,70 @@
+<div class="flex flex-col h-full gap-4 p-4">
+  <!-- Header -->
+  <div class="flex justify-between items-center">
+    <div>
+      <h3 class="text-white font-medium text-lg">Code Runner</h3>
+      <p class="text-[#858585] text-xs">Run code from the editor</p>
+    </div>
+    <button 
+      (click)="clearOutput()"
+      class="px-3 py-1 text-sm text-[#858585] hover:text-white transition-colors">
+      Clear
+    </button>
+  </div>
+
+  <!-- Language Selector -->
+  <div class="flex gap-4 items-center custom-scrollbar">
+    <label class="text-white text-sm font-medium">Language:</label>
+    <select 
+      [value]="selectedLanguage() + ':' + selectedVersion()"
+      (change)="onLanguageChange($event)"
+      class="flex-1 p-2 bg-[#1e1e1e] text-white border border-[#333333] rounded-md 
+             focus:outline-none focus:border-[#007acc]">
+      @for (option of languageOptions(); track option.language + option.version) {
+        <option [value]="option.language + ':' + option.version">
+          {{ option.displayName }}
+        </option>
+      }
+    </select>
+  </div>
+
+  <!-- Standard Input -->
+  <div class="flex flex-col">
+    <label class="text-white text-sm font-medium mb-2">Input</label>
+    <textarea 
+      [value]="stdin()"
+      (input)="onStdinChange($event)"
+      placeholder="Enter input for your program (optional)..."
+      class="w-full h-24 p-3 bg-[#1e1e1e] text-white border border-[#333333] rounded-md 
+             focus:outline-none focus:border-[#007acc] resize-none font-mono text-sm"
+      [disabled]="isRunning()">
+    </textarea>
+  </div>
+
+  <!-- Run Button -->
+  <button 
+    (click)="runCode()"
+    [disabled]="isRunning()"
+    class="px-6 py-3 bg-[#28a745] text-white rounded-md hover:bg-[#218838] 
+           disabled:bg-[#333333] disabled:cursor-not-allowed transition-colors 
+           flex items-center justify-center gap-2 font-medium">
+    @if (isRunning()) {
+      <span class="animate-spin">⟳</span>
+    } @else {
+      <span>▶</span>
+    }
+    <span>{{ isRunning() ? 'Running...' : 'Run Code' }}</span>
+  </button>
+
+  <!-- Output -->
+  <div class="flex flex-col flex-1">
+    <label class="text-white text-sm font-medium mb-2">Output</label>
+    <textarea 
+      [value]="output()"
+      readonly
+      placeholder="Output will appear here..."
+      class="flex-1 w-full p-3 bg-[#1e1e1e] text-[#d4d4d4] border border-[#333333] rounded-md 
+             resize-none font-mono text-sm whitespace-pre-wrap">
+    </textarea>
+  </div>
+</div>

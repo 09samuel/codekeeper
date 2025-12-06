@@ -1,0 +1,79 @@
+<div class="flex min-h-screen items-center justify-center bg-gray-100">
+  <div class="w-full max-w-sm bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6 text-center">Create a new account</h2>
+
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
+
+      <!-- Name -->
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700">
+          Name
+        </label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          required
+          class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+        />
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">
+          Email address
+        </label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          required
+          class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+        />
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">
+          Password
+        </label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          required
+          class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+        />
+      </div>
+
+      <!-- Confirm Password -->
+      <div>
+        <label for="confirm_password" class="block text-sm font-medium text-gray-700">
+          Confirm Password
+        </label>
+        <input
+          id="confirm_password"
+          type="password"
+          formControlName="confirmPassword"
+          required
+          class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+        />
+      </div>
+
+      <!-- Register button -->
+      <button
+        type="submit"
+        class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+      >
+        Register
+      </button>
+  </form>
+
+
+    <!-- Login link -->
+    <p class="mt-6 text-center text-sm text-gray-600">
+      Already have an account?
+      <a (click)="goToLogin()" class="text-blue-600 hover:underline">Login</a>
+    </p>
+  </div>
+</div>

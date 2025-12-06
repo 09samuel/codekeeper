@@ -1,0 +1,65 @@
+<div class="flex min-h-screen items-center justify-center bg-gray-100">
+  <div class="w-full max-w-sm bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6 text-center">Sign in to your account</h2>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+
+      <!-- Email -->
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">
+          Email address
+        </label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          required
+          class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+        />
+        <p *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid"
+           class="text-sm text-red-600">
+          Please enter a valid email.
+        </p>
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">
+          Password
+        </label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          required
+          class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+        />
+        <p *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+           class="text-sm text-red-600">
+          Password is required (min 6 characters).
+        </p>
+      </div>
+
+      <!-- Forgot password link -->
+      <div class="flex justify-end">
+        <a href="#" class="text-sm text-blue-600 hover:underline">
+          Forgot password?
+        </a>
+      </div>
+
+      <!-- Sign in button -->
+      <button
+        type="submit"
+        class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+      >
+        Sign in
+      </button>
+    </form>
+
+    <!-- Register link -->
+    <p class="mt-6 text-center text-sm text-gray-600">
+      Don't have an account?
+      <a (click)="goToRegister()" class="text-blue-600 hover:underline cursor-pointer">Register</a>
+    </p>
+  </div>
+</div>

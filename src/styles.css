@@ -1,1 +1,53 @@
 /* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+@layer utilities {
+  /* Scrollbar width */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  /* Scrollbar track (background) - transparent */
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Scrollbar thumb (the grey bar) */
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #1e1e1e;
+    border-radius: 4px;
+  }
+
+  /* Scrollbar thumb on hover */
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #2a2a2a; /* slightly lighter on hover */
+  }
+
+  /* Hide scrollbar arrows */
+  .custom-scrollbar::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  /* Firefox support */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #1e1e1e transparent;
+  }
+}
+
+.custom-dialog-container .mat-mdc-dialog-surface {
+  border-radius: 8px !important;
+  background: transparent !important;
+}
+
+.hidden-scrollbar {
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Edge, Safari */
+}
+

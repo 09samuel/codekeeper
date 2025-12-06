@@ -1,0 +1,152 @@
+    <div class="p-6 bg-[#1e1e1e] text-white max-w-md w-full">
+      <!-- Header -->
+      <div class="flex items-center gap-3 mb-4">
+        <mat-icon class="text-[#007acc]">person_add</mat-icon>
+        <h2 class="text-lg font-semibold">Share "{{ data.item.title }}"</h2>
+      </div>
+
+      <!-- Current Collaborators -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium mb-3 text-[#cccccc]">People with access</label>
+        
+        <!-- Owner -->
+        <div class="flex items-center justify-between p-3 bg-[#2d2d2d] rounded mb-2">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-[#007acc] rounded-full flex items-center justify-center">
+              <mat-icon class="!text-sm text-white">person</mat-icon>
+            </div>
+            <div>
+              <p class="text-sm font-medium">{{ owner?.name || 'Owner' }}</p>
+              <p class="text-xs text-[#858585]">{{ owner?.email }}</p>
+            </div>
+          </div>
+          <span class="text-xs bg-[#007acc] px-2 py-1 rounded">Owner</span>
+        </div>
+
+        <!-- Collaborators List -->
+        <div class="max-h-[140px] overflow-y-auto pr-1 hidden-scrollbar"> 
+          <div *ngFor="let collaborator of collaborators" 
+              class="flex items-center justify-between p-3 bg-[#2d2d2d] rounded mb-2">
+              
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-[#858585] rounded-full flex items-center justify-center">
+                  <mat-icon class="!text-sm text-white">person</mat-icon>
+                </div>
+                <div>
+                  <p class="text-sm font-medium">{{ collaborator.name }}</p>
+                  <p class="text-xs text-[#858585]">{{ collaborator.email }}</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <div class="w-28">
+                  <select
+                    [value]="collaborator.permission"
+                    (change)="updatePermission(collaborator._id, $any($event.target).value)"
+                    class="w-full px-3 py-2 bg-[#1e1e1e] border border-[#3c3c3c] rounded text-sm text-[#cccccc] focus:outline-none focus:border-[#007acc]">
+                    <option value="view">Viewer</option>
+                    <option value="edit">Editor</option>
+                  </select>
+                </div>
+
+                <button
+                  mat-icon-button
+                  (click)="removeCollaborator(collaborator._id)"
+                  class="!w-8 !h-8 flex items-center justify-center group">
+                  <mat-icon class="!text-base text-[#858585] group-hover:!text-red-400 transition-colors duration-200">
+                    delete
+                  </mat-icon>
+                </button>
+              </div>
+          </div>
+        </div>
+
+        <!-- No collaborators display -->
+        <div *ngIf="collaborators.length === 0" class="text-center py-4 text-[#858585]">
+          <p class="text-sm">No collaborators yet</p>
+        </div>
+
+
+      <!-- Add Collaborator Form -->
+        <div 
+          class="mb-6"
+          [ngClass]="{ 'pt-4': collaborators.length > 2 }"
+        >
+        <label class="block text-sm font-medium mb-2 text-[#cccccc]">Add people</label>
+        <form [formGroup]="addCollaboratorForm" class="flex gap-2">
+            <!-- Email Input -->
+            <div class="flex-1">
+            <input
+                type="email"
+                placeholder="Enter email address"
+                formControlName="email"
+                class="w-full px-3 py-2 bg-[#1e1e1e] border border-[#3c3c3c] rounded text-sm text-[#cccccc] focus:outline-none focus:border-[#007acc]"
+            />
+            <p
+                *ngIf="addCollaboratorForm.get('email')?.hasError('required') && addCollaboratorForm.get('email')?.touched"
+                class="text-xs text-red-400 mt-1"
+            >
+                Email is required
+            </p>
+            <p
+                *ngIf="addCollaboratorForm.get('email')?.hasError('email') && addCollaboratorForm.get('email')?.touched"
+                class="text-xs text-red-400 mt-1"
+            >
+                Please enter a valid email
+            </p>
+            </div>
+
+            <!-- Permission Select -->
+            <div class="w-28">
+            <select
+                formControlName="permission"
+                class="w-full px-3 py-2 bg-[#1e1e1e] border border-[#3c3c3c] rounded text-sm text-[#cccccc] focus:outline-none focus:border-[#007acc]"
+            >
+                <option value="view">Viewer</option>
+                <option value="edit">Editor</option>
+            </select>
+            </div>
+
+            <!-- Add Button -->
+            <button
+            type="button"
+            (click)="addCollaborator()"
+            [disabled]="addCollaboratorForm.invalid || isAddingCollaborator"
+            class="px-4 h-[42px] rounded bg-[#007acc] text-white text-sm font-medium flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+            <svg
+                *ngIf="isAddingCollaborator"
+                class="animate-spin h-4 w-4 mr-2 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+            >
+                <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+                ></circle>
+                <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                ></path>
+            </svg>
+            <span *ngIf="!isAddingCollaborator">Add</span>
+            </button>
+        </form>
+        </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-2 pt-4 border-t border-[#2d2d2d]">
+        <button 
+          mat-button 
+          (click)="dialogRef.close()"
+          class="!text-[#858585] hover:!bg-[#2a2a2a]">
+          Done
+        </button>
+      </div>
+    </div>

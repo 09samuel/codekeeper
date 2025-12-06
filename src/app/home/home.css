@@ -1,0 +1,193 @@
+.sidebar-panel {
+  width: 16rem; /* w-64 = 256px - fixed size */
+  min-width: 16rem; /* Prevents shrinking */
+  max-width: 16rem; /* Prevents growing */
+  flex-shrink: 0; /* Prevents flexbox from shrinking it */
+  transition: all 0.3s ease-in-out;
+  white-space: nowrap; /* Prevents text wrapping */
+  overflow: hidden;
+}
+
+.sidebar-panel.collapsed {
+  width: 0;
+  min-width: 0;
+  max-width: 0;
+  padding: 0;
+  border: none;
+  overflow: hidden;
+}
+
+.sidebar-panel > * {
+  min-width: 16rem; /* Forces content to maintain full width */
+  white-space: normal; /* Allows normal wrapping for content inside */
+}
+
+main {
+  transition: all 0.3s ease-in-out;
+}
+
+main.expanded {
+  margin-left: 0;
+}
+/* 
+.fade-slide-in {
+  animation: fadeSlideIn 200ms ease-out;
+}
+
+.fade-out {
+  animation: fadeOut 150ms ease-in;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+} */
+
+
+/* Collaboration overlay - fixed positioning */
+.collaboration-overlay {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 2000;
+  background: rgba(37, 37, 38, 0.98);
+  backdrop-filter: blur(10px);
+  border-radius: 6px;
+  padding: 6px 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  border: 1px solid #3e3e42;
+}
+
+/* Avatar circle styling */
+/* .avatar-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #1e1e1e;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #2d2d2d;
+  transition: transform 0.2s ease, z-index 0.2s ease;
+  cursor: pointer;
+}
+
+.avatar-circle:hover {
+  transform: translateY(-2px) scale(1.1);
+  z-index: 3000 !important;
+  border-color: #007acc;
+}
+
+.avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* More users indicator */
+/* .avatar-more {
+  background: linear-gradient(135deg, #007acc 0%, #005a9e 100%);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  user-select: none;
+}  */
+
+/* Share button */
+.share-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background-color: #0e639c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.share-button:hover {
+  background-color: #1177bb;
+}
+
+.share-button mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+
+
+
+/* Avatar styles */
+.avatar-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #1e1e1e;
+  background: #007acc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  overflow: hidden;
+  position: relative;
+}
+
+.avatar-more {
+  background: #383838;
+  color: #858585;
+}
+
+.avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Collaboration overlay */
+.collaboration-overlay {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: rgba(37, 37, 38, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+/* Tooltip improvements */
+.avatar-circle {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.avatar-circle:hover {
+  transform: scale(1.1);
+  z-index: 1001 !important;
+}

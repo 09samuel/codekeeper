@@ -1,0 +1,6 @@
+:host {
+    display: block;
+}
+.mat-mdc-form-field {
+    width: 100%;
+}
