@@ -17,7 +17,7 @@
     <textarea 
       [(ngModel)]="prompt"
       placeholder="Ask anything... (e.g., 'Explain this code', 'How do I fix this error?', 'Generate a function for...')"
-      class="flex-1 w-full p-3 bg-[#1e1e1e] text-white border border-[#333333] rounded-md 
+      class="custom-scrollbar flex-1 w-full p-3 bg-[#1e1e1e] text-white border border-[#333333] rounded-md 
              focus:outline-none focus:border-[#007acc] resize-none font-mono text-sm"
       [disabled]="isLoading()"
       (keydown.ctrl.enter)="sendPrompt()">
@@ -43,7 +43,7 @@
       [value]="response()"
       readonly
       placeholder="AI response will appear here..."
-      class="flex-1 w-full p-3 bg-[#1e1e1e] text-[#d4d4d4] border border-[#333333] rounded-md 
+      class="custom-scrollbar flex-1 w-full p-3 bg-[#1e1e1e] text-[#d4d4d4] border border-[#333333] rounded-md 
              resize-none font-mono text-sm whitespace-pre-wrap">
     </textarea>
   </div>

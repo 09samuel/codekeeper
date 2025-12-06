@@ -17,6 +17,7 @@ import { AddCollaboratorService } from '../services/add-collaborator-service';
 import { Observable } from 'rxjs';
 import { NotificationService } from '../services/notification-service';
 import { environment } from '../../environments/environment';
+import { RuntimeService } from '../runtime-service';
 
 
 @Component({
@@ -63,7 +64,8 @@ export class Home implements OnDestroy {
     private collabRealtime: CollaboratorRealtimeService,
     private collaboratorStore: CollaboratorStoreService,
     private addCollaboratorService: AddCollaboratorService,
-    private notification: NotificationService
+    private notification: NotificationService,
+    private runtimeService: RuntimeService
   ) {
     this.collaborators$ = this.collaboratorStore.collaborators$;
 
@@ -83,6 +85,7 @@ export class Home implements OnDestroy {
     }
     this.subscribeToCollaboratorRemovals();
     this.currentUserId = this.authService.getCurrentUserId() || '';
+    this.runtimeService.loadRuntimes();
   }
 
   ngOnDestroy() {

@@ -1,30 +1,11 @@
-import { Component, OnInit, signal, Input } from '@angular/core';
+import { Component, OnInit, signal, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { NotificationService } from '../services/notification-service';
+import { RuntimeService } from '../runtime-service';
 
-interface Runtime {
-  language: string;
-  version: string;
-  aliases: string[];
-  runtime?: string;
-}
-
-interface ExecutionResult {
-  success: boolean;
-  output: string;
-  stderr: string;
-  exitCode: number;
-  language: string;
-  version: string;
-}
-
-interface LanguageOption {
-  language: string;
-  version: string;
-  displayName: string;
-}
 
 @Component({
   selector: 'app-code-runner',
@@ -34,46 +15,29 @@ interface LanguageOption {
   styleUrls: ['./code-runner.css']
 })
 export class CodeRunner implements OnInit {
-  @Input() editorContent: string = ''; // Will receive code from editor
+  private http = inject(HttpClient);
+  private notificationService = inject(NotificationService);
+  private runtimeService = inject(RuntimeService);
   
-  languageOptions = signal<LanguageOption[]>([]);
+  @Input() editorContent: string = '';
+  
   selectedLanguage = signal<string>('');
   selectedVersion = signal<string>('');
   stdin = signal<string>('');
   output = signal<string>('');
   isRunning = signal<boolean>(false);
 
-  constructor(private http: HttpClient) {}
-
-  async ngOnInit() {
-    await this.loadRuntimes();
+  // Access shared language options from service
+  get languageOptions() {
+    return this.runtimeService.languageOptions;
   }
 
-  async loadRuntimes() {
-    try {
-      const result = await firstValueFrom(
-        this.http.get<{ success: boolean; runtimes: Runtime[] }>(`${environment.API_BASE_URL}/api/code/runtimes`)
-      );
-
-      if (result.success && result.runtimes) {
-        const options: LanguageOption[] = result.runtimes.map(runtime => ({
-          language: runtime.language,
-          version: runtime.version,
-          displayName: `${this.capitalize(runtime.language)} (${runtime.version})`
-        }));
-        
-        this.languageOptions.set(options);
-        
-        if (options.length > 0) {
-          this.selectedLanguage.set(options[0].language);
-          this.selectedVersion.set(options[0].version);
-        }
-        
-        console.log(`✓ Loaded ${options.length} language runtimes`);
-      }
-    } catch (error) {
-      console.error('Failed to load runtimes:', error);
-      this.output.set('Error: Failed to load available languages');
+  ngOnInit() {
+    // Just set default language from already-loaded runtimes
+    const options = this.languageOptions();
+    if (options.length > 0 && !this.selectedLanguage()) {
+      this.selectedLanguage.set(options[0].language);
+      this.selectedVersion.set(options[0].version);
     }
   }
 
@@ -99,11 +63,12 @@ export class CodeRunner implements OnInit {
   }
 
   async runCode() {
-    // Get code from editor input
     const code = this.editorContent;
     
     if (!code.trim()) {
-      this.output.set('Error: No code to run. Please write some code in the editor.');
+      const errorMsg = 'No code to run. Please write some code in the editor.';
+      this.output.set(`Error: ${errorMsg}`);
+      this.notificationService.error(errorMsg);
       return;
     }
 
@@ -112,7 +77,7 @@ export class CodeRunner implements OnInit {
 
     try {
       const result = await firstValueFrom(
-        this.http.post<ExecutionResult>(`${environment.API_BASE_URL}/api/code/execute`, {
+        this.http.post<any>(`${environment.API_BASE_URL}/api/code/execute`, {
           language: this.selectedLanguage(),
           version: this.selectedVersion(),
           code: code,
@@ -134,13 +99,23 @@ export class CodeRunner implements OnInit {
         outputText += `\n\n--- Execution Info ---\nLanguage: ${result.language} ${result.version}\nExit Code: ${result.exitCode}`;
         
         this.output.set(outputText || 'Program executed successfully (no output)');
+        
+        if (result.exitCode === 0) {
+          this.notificationService.success('Code executed successfully!');
+        } else {
+          this.notificationService.error(`Code executed with exit code: ${result.exitCode}`);
+        }
       } else {
-        this.output.set('Error: Code execution failed');
+        const errorMsg = 'Code execution failed';
+        this.output.set(`Error: ${errorMsg}`);
+        this.notificationService.error(errorMsg);
       }
 
     } catch (error: any) {
-      const errorMsg = error?.error?.error || 'Failed to execute code';
-      this.output.set(`Error: ${errorMsg}\n\n${error?.error?.details || ''}`);
+      const errorMsg = error?.error?.error || error?.error?.message || 'Failed to execute code';
+      const details = error?.error?.details || '';
+      this.output.set(`Error: ${errorMsg}\n\n${details}`);
+      this.notificationService.error(errorMsg);
       console.error('Code execution error:', error);
     } finally {
       this.isRunning.set(false);
@@ -151,7 +126,4 @@ export class CodeRunner implements OnInit {
     this.output.set('');
     this.stdin.set('');
   }
-
-
-
 }
