@@ -1,0 +1,56 @@
+{
+  "name": "codekeeper",
+  "version": "1.0.0",
+  "description": "This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.0.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/09samuel/codekeeper.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/09samuel/codekeeper/issues"
+  },
+  "homepage": "https://github.com/09samuel/codekeeper#readme",
+  "dependencies": {
+    "@angular/animations": "^21.0.3",
+    "@angular/cdk": "^21.0.2",
+    "@angular/common": "^21.0.3",
+    "@angular/compiler": "^21.0.3",
+    "@angular/core": "^21.0.3",
+    "@angular/forms": "^21.0.3",
+    "@angular/material": "^21.0.2",
+    "@angular/platform-browser": "^21.0.3",
+    "@angular/platform-browser-dynamic": "^21.0.3",
+    "@angular/router": "^21.0.3",
+    "@codemirror/lang-cpp": "^6.0.3",
+    "@codemirror/lang-css": "^6.3.1",
+    "@codemirror/lang-html": "^6.4.11",
+    "@codemirror/lang-java": "^6.0.2",
+    "@codemirror/lang-javascript": "^6.2.4",
+    "@codemirror/lang-json": "^6.0.2",
+    "@codemirror/lang-markdown": "^6.5.0",
+    "@codemirror/lang-php": "^6.0.2",
+    "@codemirror/lang-python": "^6.2.1",
+    "@codemirror/lang-rust": "^6.0.2",
+    "@codemirror/lang-sql": "^6.10.0",
+    "@codemirror/lang-xml": "^6.1.0",
+    "@fsegurai/codemirror-theme-github-dark": "^6.2.3",
+    "jwt-decode": "^4.0.0",
+    "rxjs": "^7.8.2",
+    "tslib": "^2.8.1",
+    "y-codemirror.next": "^0.3.5",
+    "y-websocket": "^3.0.0",
+    "yjs": "^13.6.27",
+    "zone.js": "^0.16.0"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^5.1.13"
+  }
+}
