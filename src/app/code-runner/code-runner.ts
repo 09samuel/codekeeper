@@ -2,6 +2,7 @@ import { Component, OnInit, signal, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 interface Runtime {
   language: string;
@@ -51,7 +52,7 @@ export class CodeRunner implements OnInit {
   async loadRuntimes() {
     try {
       const result = await firstValueFrom(
-        this.http.get<{ success: boolean; runtimes: Runtime[] }>('http://localhost:3000/api/code/runtimes')
+        this.http.get<{ success: boolean; runtimes: Runtime[] }>(`${environment.API_BASE_URL}/api/code/runtimes`)
       );
 
       if (result.success && result.runtimes) {
@@ -111,7 +112,7 @@ export class CodeRunner implements OnInit {
 
     try {
       const result = await firstValueFrom(
-        this.http.post<ExecutionResult>('http://localhost:3000/api/code/execute', {
+        this.http.post<ExecutionResult>(`${environment.API_BASE_URL}/api/code/execute`, {
           language: this.selectedLanguage(),
           version: this.selectedVersion(),
           code: code,

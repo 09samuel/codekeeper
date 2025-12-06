@@ -6,6 +6,7 @@ import { AuthService } from '../services/auth-service';
 import { CommonModule } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 import { NotificationService } from '../services/notification-service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -64,7 +65,7 @@ export class Login implements OnInit {
 
     try {
       const response: any = await firstValueFrom(
-        this.http.post('http://localhost:3000/api/auth/login', { email, password })
+        this.http.post(`${environment.API_BASE_URL}/api/auth/login`, { email, password })
       );
 
       if (response.accessToken && response.refreshToken) {

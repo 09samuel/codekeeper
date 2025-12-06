@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-ai',
@@ -26,9 +27,10 @@ export class Ai {
     
     try {
       const result = await firstValueFrom(
-        this.http.post<{ success: boolean; content: string }>('http://localhost:3000/api/ai/generate-text', {
-          prompt: this.prompt()
-        })
+        this.http.post<{ success: boolean; content: string }>(
+        `${environment.API_BASE_URL}/api/ai/generate-text`,
+        { prompt: this.prompt() }
+      )
       );
 
       if (result.success && result.content) {

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { jwtDecode } from 'jwt-decode';
 import { firstValueFrom, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 interface JwtPayload {
   sub: string;
@@ -52,7 +53,7 @@ export class AuthService {
 
     try {
       const response: any = await firstValueFrom(
-        this.http.post('http://localhost:3000/api/auth/refresh', { refreshToken })
+        this.http.post(`${environment.API_BASE_URL}/api/auth/refresh`, { refreshToken })
       );
 
       this.setTokens(response.accessToken, response.refreshToken);
@@ -67,7 +68,7 @@ export class AuthService {
   refreshTokens$(): Observable<{ accessToken: string; refreshToken: string }> {
     const refreshToken = this.getRefreshToken();
     return this.http.post<{ accessToken: string; refreshToken: string }>(
-      'http://localhost:3000/api/auth/refresh',
+      `${environment.API_BASE_URL}/api/auth/refresh`,
       { refreshToken }
     );
   }
@@ -78,7 +79,7 @@ export class AuthService {
     try {
       if (refreshToken) {
         // Inform backend to invalidate refresh token
-        await firstValueFrom(this.http.post(`http://localhost:3000/api/auth/logout`, { refreshToken }));
+        await firstValueFrom(this.http.post(`${environment.API_BASE_URL}/api/auth/logout`, { refreshToken }));
       }
     } catch (err) {
       console.warn('Logout API failed (continuing local logout):', err);

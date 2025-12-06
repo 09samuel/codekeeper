@@ -16,6 +16,8 @@ import { CollaboratorRealtimeService } from '../services/collaborator-realtime-s
 import { AddCollaboratorService } from '../services/add-collaborator-service';
 import { Observable } from 'rxjs';
 import { NotificationService } from '../services/notification-service';
+import { environment } from '../../environments/environment';
+
 
 @Component({
   selector: 'app-home',
@@ -221,7 +223,7 @@ export class Home implements OnDestroy {
     }
 
     this.wsProvider = new WebsocketProvider(
-      'ws://localhost:1234',
+       environment.WS_BASE_URL,
       `doc-${documentId}`,
       this.ydoc,
       { 
@@ -364,8 +366,9 @@ export class Home implements OnDestroy {
 
   generateAvatarUrl(name: string): string {
     const encodedName = encodeURIComponent(name);
-    return `https://ui-avatars.com/api/?name=${encodedName}&background=random&size=32`;
+    return `${environment.AVATAR_BASE_URL}/?name=${encodedName}&background=random&size=32`;
   }
+
 
   async logout() {
     // Disconnect Yjs

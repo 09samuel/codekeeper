@@ -5,13 +5,14 @@ import { Observable, tap } from 'rxjs';
 
 import { AddCollaborator, CollaboratorDialogData } from '../add-collaborator/add-collaborator';
 import { Collaborator, CollaboratorStoreService } from './collaborator-store-service';
+import { environment } from '../../environments/environment';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class AddCollaboratorService {
-  private apiUrl = 'http://localhost:3000/api/collaborators';
+  private apiUrl = `${environment.API_BASE_URL}/api/collaborators`;
 
   constructor(
     private dialog: MatDialog,

@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../services/auth-service';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../services/notification-service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-registration',
@@ -30,7 +31,7 @@ export class Registration {
     if (this.registerForm.valid) {
       const { name, email, password } = this.registerForm.value;
 
-      this.http.post('http://localhost:3000/api/auth/register', { name, email, password }).subscribe({
+      this.http.post(`${environment.API_BASE_URL}/api/auth/register`, { name, email, password }).subscribe({
         next: (response: any) => {
           console.log('Registration successful', response);
           this.notification.success('Registration successful! Verification email sent.');
