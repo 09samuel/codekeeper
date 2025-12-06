@@ -148,17 +148,17 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
           }
           
           // AWAIT editor initialization
-          await this.initEditor();
-          
+          await this.initEditor().catch(err => {
+            console.error('❌ Failed to initialize editor:', err);
+          });
+
           // subscribe AFTER editor is ready
           this.subscribeToPermissionChanges();
         },
         error: async (err) => { 
           console.error('❌ Error fetching initial permission:', err);
-          this.userPermission = 'view';
-          
-          await this.initEditor();
-          this.subscribeToPermissionChanges();
+          this.loadError.emit();
+          this.cleanupEditor();
         }
       });
     }
@@ -356,7 +356,7 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
   
 
   private async initEditor(): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       this.ytext = this.ydoc.getText('codemirror');
       this.undoManager = new Y.UndoManager(this.ytext);
 
@@ -381,7 +381,7 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
                 return r.text();
               })
               .then(content => {
-                // 🔥 ADD THIS CHECK - Detect S3 XML error responses
+                // Detect S3 XML error responses
                 if (content.trim().startsWith('<?xml') && content.includes('<Error>')) {
                   console.error('❌ S3 returned an error response:', content);
                   throw new Error('File not found in S3');
@@ -404,7 +404,8 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
                 console.error('❌ Error loading document:', err);
                 this.showNotification('Document file not found. Starting with empty document.');
                 this.loadError.emit();
-                finish(); // Create empty editor
+                this.cleanupEditor();
+                reject(err);
               });
           } else {
             finish();
@@ -413,7 +414,8 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
         error: (err) => {
           console.error('❌ Error getting signed URL:', err);
           this.loadError.emit();
-          finish();
+          this.cleanupEditor(); 
+          reject(err);
         }
       });
     } else {

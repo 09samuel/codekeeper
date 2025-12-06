@@ -148,8 +148,11 @@ export class Home implements OnDestroy {
     }
   }
 
-  closeTab(event: Event, tabId: string) {
-    event.stopPropagation();
+  closeTab(tabId: string, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    
     
     const closingTab = this.tabs.find(t => t.id === tabId);
     const wasActiveTab = this.activeTab?.id === tabId;
@@ -429,6 +432,9 @@ export class Home implements OnDestroy {
 
   onEditorLoadError() {
     this.isEditorLoading = false;
+    if (this.activeTab) {
+      this.closeTab(this.activeTab.id); 
+    }
     this.notification.error('Failed to load document content. Please try again.');
   }
 }

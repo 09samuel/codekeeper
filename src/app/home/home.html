@@ -52,7 +52,7 @@
           class="flex items-center gap-2 px-3 py-2 border-r border-[#1e1e1e] cursor-pointer hover:bg-[#2a2a2a] min-w-[120px] max-w-[200px]">
           <span class="text-sm text-[#cccccc] truncate">{{ tab.title }}</span>
           <button 
-            (click)="closeTab($event, tab.id)"
+            (click)="closeTab(tab.id, $event)"
             class="ml-auto p-0.5 hover:bg-[#3e3e42] rounded">
             <mat-icon class="!text-base text-[#858585] hover:text-white">close</mat-icon>
           </button>
