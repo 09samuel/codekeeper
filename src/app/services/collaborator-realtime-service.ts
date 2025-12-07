@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { CollaboratorStoreService } from './collaborator-store-service';
 import { NotificationService } from './notification-service';
 import { DocumentService } from './document-service';
+import { environment } from '../../environments/environment';
+
 
 @Injectable({ providedIn: 'root' })
 export class CollaboratorRealtimeService {
@@ -24,7 +26,7 @@ export class CollaboratorRealtimeService {
 
     console.log('🔌 Connecting GLOBAL collaborator WebSocket…');
 
-    this.ws = new WebSocket(`ws://localhost:1234/collab-global?token=${token}`);
+    this.ws = new WebSocket(`${environment.WS_BASE_URL}/collab-global?token=${token}`);
 
     this.ws.onopen = () => {
       console.log('✅ Global collaborator WebSocket connected');
