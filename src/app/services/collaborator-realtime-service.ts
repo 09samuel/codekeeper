@@ -102,6 +102,19 @@ export class CollaboratorRealtimeService {
         this.docService.triggerRefresh();
         break;
 
+      case 'storage-quota-exceeded': {
+        console.log('⚠️ WS EVENT: storage-quota-exceeded', msg.payload);
+
+        const used = msg.payload?.usedMB ?? msg.payload?.used ?? 'unknown';
+        const limit = msg.payload?.limitMB ?? msg.payload?.limit ?? 'unknown';
+
+        this.notification.error(
+          `Storage limit exceeded. Used: ${used} MB / ${limit} MB. ` +
+          'Please delete some files or folders to free up space.'
+        );
+        break;
+      }
+
       default:
         console.warn('⚠️ Unknown collab event:', msg.type);
     }

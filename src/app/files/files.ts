@@ -436,6 +436,13 @@ export class Files implements OnInit {
     const file = input.files?.[0];
     
     if (file) {
+      const maxSize = 100 * 1024 * 1024; // 100 MB
+      if (file.size > maxSize) {
+        this.notification.error(`File size (${(file.size / (1024 * 1024)).toFixed(2)} MB) exceeds limit`);
+        input.value = '';
+        return;
+      }
+
       try {
         const content = await this.readFileContent(file);
         
@@ -457,7 +464,19 @@ export class Files implements OnInit {
         console.log(`✓ Local file "${file.name}" uploaded successfully`);
       } catch (err) {
         console.error('✗ Error uploading local file:', err);
+        
+        if ((err as any).status === 413) {
+        const errorData = (err as any).error;
+        if (errorData?.usedMB && errorData?.limitMB) {
+          this.notification.error(
+            `Storage limit exceeded. Used: ${errorData.usedMB} MB / ${errorData.limitMB} MB. Please delete some files.`
+          );
+        } else {
+          this.notification.error('Storage limit exceeded. Please delete some files.');
+        }
+      } else {
         this.notification.error('Failed to upload file');
+      }
       }
     }
     
@@ -469,6 +488,21 @@ export class Files implements OnInit {
     const files = input.files;
     
     if (files && files.length > 0) {
+      let totalSize = 0;
+      for (let i = 0; i < files.length; i++) {
+        totalSize += files[i].size;
+      }
+      
+      const totalSizeMB = (totalSize / (1024 * 1024)).toFixed(2);
+      console.log(`📦 Total folder size: ${totalSizeMB} MB (${files.length} files)`);
+      
+      const maxSize = 100 * 1024 * 1024; // 100 MB
+      if (totalSize > maxSize) {
+        this.notification.error(`Folder size (${totalSizeMB} MB) exceeds 100 MB limit`);
+        input.value = '';
+        return;
+      }
+      
       this.isLoading.set(true);
       try {
         const firstFile = files[0] as any;
@@ -491,7 +525,19 @@ export class Files implements OnInit {
         console.log(`✓ Folder uploaded successfully`);
       } catch (err) {
         console.error('✗ Error uploading folder:', err);
-        this.notification.error('Failed to upload folder: ' + (err as any).message);
+        
+        if ((err as any).status === 413) {
+          const errorData = (err as any).error;
+          if (errorData?.usedMB && errorData?.limitMB) {
+            this.notification.error(
+              `Storage limit exceeded during upload. Used: ${errorData.usedMB} MB / ${errorData.limitMB} MB`
+            );
+          } else {
+            this.notification.error('Storage limit exceeded. Unable to upload entire folder.');
+          }
+        } else {
+          this.notification.error('Failed to upload folder: ' + (err as any).message);
+        }
         await this.loadUserDocuments();
       } finally {
         this.isLoading.set(false);
