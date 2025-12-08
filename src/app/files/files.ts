@@ -208,9 +208,12 @@ export class Files implements OnInit {
       }
     });
 
-    const folderName = await firstValueFrom(dialogRef.afterClosed());
+    let folderName = await firstValueFrom(dialogRef.afterClosed());
 
     if (!folderName) return;
+
+    // Check for duplicate folder names
+    folderName = this.getUniqueFolderName(folderName);
 
     try {
       this.isLoading.set(true);
@@ -225,6 +228,24 @@ export class Files implements OnInit {
       this.isLoading.set(false);
     }
   }
+
+  private getUniqueFolderName(folderName: string): string {
+  const currentFolders = this.folders().map(f => f.title);
+  
+  if (!currentFolders.includes(folderName)) {
+    return folderName;
+  }
+
+  let counter = 1;
+  let newFolderName: string;
+  
+  do {
+    newFolderName = `${folderName} (${counter})`;
+    counter++;
+  } while (currentFolders.includes(newFolderName));
+
+  return newFolderName;
+}
 
   async createNewFile(): Promise<void> {
     const dialogRef = this.dialog.open(FileDialogComponent, {
@@ -248,6 +269,9 @@ export class Files implements OnInit {
     if (!hasExtension) {
       title = `${title}.txt`;
     }
+
+    // Check for duplicates and generate unique name
+    title = this.getUniqueFileName(title);
 
     try {
       this.isLoading.set(true);
@@ -281,6 +305,31 @@ export class Files implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  // Add this helper method
+  private getUniqueFileName(fileName: string): string {
+    const currentFiles = this.files().map(f => f.title);
+    
+    if (!currentFiles.includes(fileName)) {
+      return fileName;
+    }
+
+    // Split filename and extension
+    const lastDotIndex = fileName.lastIndexOf('.');
+    const name = lastDotIndex > 0 ? fileName.substring(0, lastDotIndex) : fileName;
+    const ext = lastDotIndex > 0 ? fileName.substring(lastDotIndex) : '';
+
+    // Find the next available number
+    let counter = 1;
+    let newFileName: string;
+    
+    do {
+      newFileName = `${name} (${counter})${ext}`;
+      counter++;
+    } while (currentFiles.includes(newFileName));
+
+    return newFileName;
   }
 
   private async waitForDocumentReady(docId: string, maxRetries = 5): Promise<void> {
