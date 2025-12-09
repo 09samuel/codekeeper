@@ -51,3 +51,15 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   display: none; /* Chrome, Edge, Safari */
 }
 
+/* Custom dialog styles */
+.custom-dialog-container .mat-mdc-dialog-container {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+.custom-dialog-backdrop {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}

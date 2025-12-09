@@ -205,7 +205,8 @@ export class Files implements OnInit {
         placeholder: 'Folder name',
         defaultValue: 'New Folder',
         confirmText: 'Create'
-      }
+      },
+      panelClass: 'custom-dialog-container'
     });
 
     let folderName = await firstValueFrom(dialogRef.afterClosed());
@@ -254,7 +255,8 @@ export class Files implements OnInit {
         placeholder: 'File name',
         defaultValue: 'Untitled Document',
         confirmText: 'Create'
-      }
+      },
+      panelClass: 'custom-dialog-container',
     });
 
     let title = await firstValueFrom(dialogRef.afterClosed());

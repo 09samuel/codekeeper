@@ -18,6 +18,9 @@ import { Observable } from 'rxjs';
 import { NotificationService } from '../services/notification-service';
 import { environment } from '../../environments/environment';
 import { RuntimeService } from '../runtime-service';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmDialog } from '../confirm-dialog/confirm-dialog';
+
 
 
 @Component({
@@ -65,7 +68,8 @@ export class Home implements OnDestroy {
     private collaboratorStore: CollaboratorStoreService,
     private addCollaboratorService: AddCollaboratorService,
     private notification: NotificationService,
-    private runtimeService: RuntimeService
+    private runtimeService: RuntimeService,
+    private dialog: MatDialog  
   ) {
     this.collaborators$ = this.collaboratorStore.collaborators$;
 
@@ -376,17 +380,48 @@ export class Home implements OnDestroy {
   }
 
 
-  async logout() {
-    // Disconnect Yjs
-    this.disconnectYjs();
+  // async logout() {
+  //   // Disconnect Yjs
+  //   this.disconnectYjs();
     
-    // Explicitly disconnect global WebSocket on logout
-    console.log('🌐 Disconnecting global collaborator WebSocket on logout...');
-    this.collabRealtime.disconnect();
+  //   // Explicitly disconnect global WebSocket on logout
+  //   console.log('🌐 Disconnecting global collaborator WebSocket on logout...');
+  //   this.collabRealtime.disconnect();
     
-    await this.authService.logout();
-    this.router.navigate(['/login']);
-  }
+  //   await this.authService.logout();
+  //   this.router.navigate(['/login']);
+  // }
+
+  logout() {
+  const dialogRef = this.dialog.open(ConfirmDialog, {
+    data: {
+      title: 'Confirm Logout',
+      message: 'Are you sure you want to logout? Any unsaved changes will be lost.',
+      confirmText: 'Logout',
+      cancelText: 'Cancel',
+      icon: 'logout',
+      iconColor: 'red-400'
+    },
+    panelClass: 'custom-dialog-container',
+    backdropClass: 'custom-dialog-backdrop',
+    disableClose: false
+  });
+
+  dialogRef.afterClosed().subscribe(async (confirmed: boolean) => {
+    if (confirmed) {
+      // Disconnect Yjs
+      this.disconnectYjs();
+      
+      // Explicitly disconnect global WebSocket on logout
+      console.log('🌐 Disconnecting global collaborator WebSocket on logout...');
+      this.collabRealtime.disconnect();
+      
+      await this.authService.logout();
+      this.router.navigate(['/login']);
+    }
+  });
+}
+
 
   getEditorContent(): string {
     if (this.editorComponent) {

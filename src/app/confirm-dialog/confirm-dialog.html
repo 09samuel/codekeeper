@@ -1,0 +1,31 @@
+<div class="p-6 bg-[#1e1e1e] text-white w-96">
+      
+      <!-- Header -->
+      <div class="flex items-center gap-3 mb-4">
+        <mat-icon [class]="'text-' + (data.iconColor || '[#007acc]')">
+          {{ data.icon || 'help_outline' }}
+        </mat-icon>
+        <h2 class="text-lg font-semibold">{{ data.title }}</h2>
+      </div>
+
+      <!-- Message -->
+      <div class="mb-6">
+        <p class="text-sm text-[#cccccc] leading-relaxed">{{ data.message }}</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-2 pt-4">
+        <button 
+          type="button"
+          (click)="dialogRef.close(false)"
+          class="px-4 py-2 bg-[#3c3c3c] rounded text-white hover:bg-[#4a4a4a] transition-colors">
+          {{ data.cancelText || 'Cancel' }}
+        </button>
+        <button 
+          type="button"
+          (click)="dialogRef.close(true)"
+          class="px-4 py-2 bg-[#007acc] rounded text-white hover:bg-[#0098ff] transition-colors">
+          {{ data.confirmText || 'Confirm' }}
+        </button>
+      </div>
+    </div>
