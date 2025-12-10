@@ -50,7 +50,7 @@
           <!-- Folder contents -->
           @if (documents().length > 0) {
 
-           <!-- Folders -->
+            <!-- Folders -->
             @for (item of folders(); track item._id) {
               <div class="flex items-center gap-2 px-2 py-2 hover:bg-[#2a2a2a] rounded group">
 
@@ -64,42 +64,42 @@
                 <!-- Filename -->
                 <span class="text-xs flex-1 truncate-name" (click)="enterFolder(item)"> {{ item.title }} </span>
 
-                <!-- Label -->
-                <span class="text-[10px] text-[#858585]">Folder</span>
+                <!-- Right side: Label + Actions -->
+                <div class="flex items-center gap-2 ml-auto">
+                  <!-- Label -->
+                  <span class="text-[10px] text-[#858585]">Folder</span>
 
-                <!-- Actions -->
-                <div class="flex items-center gap-0">
+                  <!-- Actions -->
+                  <div class="flex items-center gap-0">
+                    <!-- Share -->
+                    <div class="relative group" title="Share">
+                      <button
+                        class="file-action-btn p-1 rounded transition-colors opacity-0
+                              group-hover:opacity-100 hover:bg-[#363636]
+                              disabled:opacity-0 disabled:group-hover:opacity-40
+                              disabled:cursor-not-allowed"
+                        (click)="$event.stopPropagation(); addCollaboratorForFolder(item)"
+                        [disabled]="!item.isOwner">
 
-                  <!-- Share -->
-                  <div class="relative group" title="Share">
+                        <mat-icon class="text-[#858585]" style="font-size: 14px; width:14px; height:14px;">
+                          person_add
+                        </mat-icon>
+                      </button>
+                    </div>
+
+                    <!-- Menu -->
                     <button
                       class="file-action-btn p-1 rounded transition-colors opacity-0
-                            group-hover:opacity-100 hover:bg-[#363636]
-                            disabled:opacity-0 disabled:group-hover:opacity-40
-                            disabled:cursor-not-allowed"
-                      (click)="$event.stopPropagation(); addCollaboratorForFolder(item)"
-                      [disabled]="!item.isOwner">
+                            group-hover:opacity-100 hover:bg-[#363636]"
+                      (click)="$event.stopPropagation()"
+                      [matMenuTriggerFor]="folderMenu">
 
                       <mat-icon class="text-[#858585]" style="font-size: 14px; width:14px; height:14px;">
-                        person_add
+                        more_vert
                       </mat-icon>
                     </button>
                   </div>
-
-                  <!-- Menu -->
-                  <button
-                    class="file-action-btn p-1 rounded transition-colors opacity-0
-                          group-hover:opacity-100 hover:bg-[#363636]"
-                    (click)="$event.stopPropagation()"
-                    [matMenuTriggerFor]="folderMenu">
-
-                    <mat-icon class="text-[#858585]" style="font-size: 14px; width:14px; height:14px;">
-                      more_vert
-                    </mat-icon>
-
-                  </button>
-              </div>
-
+                </div>
 
                 <mat-menu #folderMenu="matMenu">
                   <button mat-menu-item (click)="renameItem(item)">
@@ -112,7 +112,6 @@
                   </button>
                 </mat-menu>
               </div>
-
             }
 
             <!-- Files -->
@@ -128,9 +127,8 @@
                 <!-- Filename -->
                 <span class="text-xs flex-1 truncate-name" (click)="openFile(item)"> {{ item.title }} </span>
 
-                <!-- Actions -->
-                <div class="flex items-center gap-0">
-
+                <!-- Right side: Actions only (no label for files) -->
+                <div class="flex items-center gap-0 ml-auto">
                   <!-- Share -->
                   <div class="relative group" title="Share">
                     <button
@@ -159,7 +157,7 @@
                     </mat-icon>
                   </button>
                 </div>
-                              
+                                      
                 <!-- Menu for this file -->
                 <mat-menu #fileMenu="matMenu" class="dark-menu">
                   <button mat-menu-item (click)="renameItem(item)">
@@ -172,9 +170,9 @@
                     <span class="menu-text">Delete</span>
                   </button>
                 </mat-menu>
-
               </div>
             }
+
           } @else {
             <!-- Empty state -->
             <div class="flex flex-col items-center justify-center py-8 text-center h-full">

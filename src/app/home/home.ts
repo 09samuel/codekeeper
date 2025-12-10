@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy, ViewChild, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { Editor } from '../editor/editor';
@@ -20,8 +20,6 @@ import { environment } from '../../environments/environment';
 import { RuntimeService } from '../runtime-service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmDialog } from '../confirm-dialog/confirm-dialog';
-
-
 
 @Component({
   selector: 'app-home',
@@ -60,6 +58,9 @@ export class Home implements OnDestroy {
   private currentUserId: string = '';
   isEditorLoading = false;
 
+  // Mobile responsive properties
+  isMobileView = false;
+
   constructor(
     private authService: AuthService, 
     private router: Router, 
@@ -90,6 +91,9 @@ export class Home implements OnDestroy {
     this.subscribeToCollaboratorRemovals();
     this.currentUserId = this.authService.getCurrentUserId() || '';
     this.runtimeService.loadRuntimes();
+    
+    // Initialize viewport check
+    this.checkViewport();
   }
 
   ngOnDestroy() {
@@ -104,6 +108,23 @@ export class Home implements OnDestroy {
     // Only disconnect global WebSocket on component destroy (logout)
     console.log('🌐 Disconnecting global collaborator WebSocket...');
     this.collabRealtime.disconnect();
+  }
+
+  // Listen to window resize events
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.checkViewport();
+  }
+
+  // Check if mobile viewport
+  checkViewport() {
+    const wasMobile = this.isMobileView;
+    this.isMobileView = window.innerWidth <= 768;
+    
+    // Auto-collapse panel on mobile by default (only on first load or when switching to mobile)
+    if (this.isMobileView && !wasMobile) {
+      this.isPanelCollapsed = true;
+    }
   }
 
   disconnectYjs() {
@@ -157,7 +178,6 @@ export class Home implements OnDestroy {
       event.stopPropagation();
     }
     
-    
     const closingTab = this.tabs.find(t => t.id === tabId);
     const wasActiveTab = this.activeTab?.id === tabId;
 
@@ -177,11 +197,8 @@ export class Home implements OnDestroy {
 
   icons = [
     { name: 'files', icon: 'insert_drive_file' },
-    //{ name: 'chat', icon: 'chat_bubble' },
     { name: 'run', icon: 'play_arrow' },
     { name: 'ai', icon: 'psychology' },
-    //{ name: 'draw', icon: 'draw' },
-    //{ name: 'settings', icon: 'settings' },
     { name: 'logout', icon: 'logout' }
   ];
 
@@ -189,11 +206,29 @@ export class Home implements OnDestroy {
   isPanelCollapsed: boolean = false;
   
   selectPanel(panelName: string) {
-    if (this.selectedPanel === panelName && !this.isPanelCollapsed) {
-      this.isPanelCollapsed = true;
+    if (this.isMobileView) {
+      // Mobile: Toggle panel on same icon tap
+      if (this.selectedPanel === panelName && !this.isPanelCollapsed) {
+        this.isPanelCollapsed = true;
+      } else {
+        this.selectedPanel = panelName;
+        this.isPanelCollapsed = false;
+      }
     } else {
-      this.selectedPanel = panelName;
-      this.isPanelCollapsed = false;
+      // Desktop: Original behavior
+      if (this.selectedPanel === panelName && !this.isPanelCollapsed) {
+        this.isPanelCollapsed = true;
+      } else {
+        this.selectedPanel = panelName;
+        this.isPanelCollapsed = false;
+      }
+    }
+  }
+
+  // Close panel when clicking backdrop (mobile only)
+  closePanelOnMobile() {
+    if (this.isMobileView) {
+      this.isPanelCollapsed = true;
     }
   }
 
@@ -379,49 +414,35 @@ export class Home implements OnDestroy {
     return `${environment.AVATAR_BASE_URL}/?name=${encodedName}&background=random&size=32`;
   }
 
-
-  // async logout() {
-  //   // Disconnect Yjs
-  //   this.disconnectYjs();
-    
-  //   // Explicitly disconnect global WebSocket on logout
-  //   console.log('🌐 Disconnecting global collaborator WebSocket on logout...');
-  //   this.collabRealtime.disconnect();
-    
-  //   await this.authService.logout();
-  //   this.router.navigate(['/login']);
-  // }
-
   logout() {
-  const dialogRef = this.dialog.open(ConfirmDialog, {
-    data: {
-      title: 'Confirm Logout',
-      message: 'Are you sure you want to logout?',
-      confirmText: 'Logout',
-      cancelText: 'Cancel',
-      icon: 'logout',
-      iconColor: 'red-400'
-    },
-    panelClass: 'custom-dialog-container',
-    backdropClass: 'custom-dialog-backdrop',
-    disableClose: false
-  });
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      data: {
+        title: 'Confirm Logout',
+        message: 'Are you sure you want to logout?',
+        confirmText: 'Logout',
+        cancelText: 'Cancel',
+        icon: 'logout',
+        iconColor: 'red-400'
+      },
+      panelClass: 'custom-dialog-container',
+      backdropClass: 'custom-dialog-backdrop',
+      disableClose: false
+    });
 
-  dialogRef.afterClosed().subscribe(async (confirmed: boolean) => {
-    if (confirmed) {
-      // Disconnect Yjs
-      this.disconnectYjs();
-      
-      // Explicitly disconnect global WebSocket on logout
-      console.log('🌐 Disconnecting global collaborator WebSocket on logout...');
-      this.collabRealtime.disconnect();
-      
-      await this.authService.logout();
-      this.router.navigate(['/login']);
-    }
-  });
-}
-
+    dialogRef.afterClosed().subscribe(async (confirmed: boolean) => {
+      if (confirmed) {
+        // Disconnect Yjs
+        this.disconnectYjs();
+        
+        // Explicitly disconnect global WebSocket on logout
+        console.log('🌐 Disconnecting global collaborator WebSocket on logout...');
+        this.collabRealtime.disconnect();
+        
+        await this.authService.logout();
+        this.router.navigate(['/login']);
+      }
+    });
+  }
 
   getEditorContent(): string {
     if (this.editorComponent) {

@@ -14,3 +14,29 @@
   vertical-align: middle;
   cursor: pointer;
 }
+
+/* Show share and menu icons always on touch devices, only on hover on desktop */
+.file-action-btn {
+  opacity: 1; /* Always visible by default (mobile) */
+}
+
+/* On devices with hover capability (desktop), hide by default and show on hover */
+@media (hover: hover) {
+  .file-action-btn {
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  
+  .group:hover .file-action-btn {
+    opacity: 1;
+  }
+  
+  /* Keep disabled state styling */
+  .file-action-btn:disabled {
+    opacity: 0;
+  }
+  
+  .group:hover .file-action-btn:disabled {
+    opacity: 0.4;
+  }
+}
