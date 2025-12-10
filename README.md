@@ -1,59 +1,39 @@
-# Codekeeper
+# CodeKeeper
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.0.
+A real-time collaborative code editor with Google Docs-like functionality, featuring multi-language support, cloud storage, AI assistance, and live code execution.
 
-## Development server
+🔗 **Live Demo:** https://codekeeper-nu.vercel.app/
 
-To start a local development server, run:
+## Features
 
-```bash
-ng serve
-```
+- **Real-Time Collaboration** - Multiple users can edit code simultaneously with live cursor tracking and instant synchronization powered by Yjs CRDT technology
+- **Syntax Highlighting** - Comprehensive language support with intelligent code highlighting
+- **Code Execution** - Run code directly in the browser using Piston API with support for 50+ programming languages
+- **AI Integration** - Get coding assistance and responses through Pollinations AI integration
+- **Cloud Storage** - Persistent file storage with AWS S3 for seamless project management
+- **Multi-Language Support** - Write and execute code in dozens of languages including Python, JavaScript, Java, C++, and more
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Tech Stack
 
-## Code scaffolding
+### Frontend
+- **Angular v20** - Modern reactive UI framework
+- **Monaco Editor** - VS Code's editor component
+- **Yjs** - Conflict-free replicated data types for real-time collaboration
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Backend
+- **Node.js + Express** - RESTful API server
+- **WebSocket Server** - Real-time bidirectional communication
+- **MongoDB Atlas** - Cloud-hosted document database
+- **AWS S3** - Scalable object storage for files
 
-```bash
-ng generate component component-name
-```
+### APIs & Services
+- **Piston EMKC API** - Code execution engine supporting 50+ languages
+- **Pollinations AI** - AI-powered coding assistance
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Architecture
 
-```bash
-ng generate --help
-```
+CodeKeeper follows a distributed architecture with three main components:
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- **Frontend Repository** (This repo) - Angular-based client application
+- **[API Backend](https://github.com/09samuel/codekeeper-api-backend)** - Express.js REST API for file management and AI integration
+- **[WebSocket Backend](https://github.com/09samuel/codekeeper-backend)** - Yjs WebSocket server for real-time collaboration
