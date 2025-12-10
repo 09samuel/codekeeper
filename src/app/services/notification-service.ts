@@ -9,28 +9,28 @@ export class NotificationService {
   success(message: string) {
     this.snackBar.open(message, 'Close', {
       duration: 3000,
-      panelClass: ['bg-green-600', 'text-white']
+      panelClass: ['snackbar-success']
     });
   }
 
   error(message: string) {
     this.snackBar.open(message, 'Close', {
       duration: 5000,
-      panelClass: ['bg-red-600', 'text-white']
+      panelClass: ['snackbar-error']
     });
   }
 
   info(message: string) {
     this.snackBar.open(message, 'Close', {
       duration: 3000,
-      panelClass: ['bg-blue-600', 'text-white']
+      panelClass: ['snackbar-info']
     });
   }
 
   warn(message: string) {
     this.snackBar.open(message, 'Close', {
       duration: 4000,
-      panelClass: ['bg-yellow-500', 'text-white']
+      panelClass: ['snackbar-warn']
     });
   }
 }

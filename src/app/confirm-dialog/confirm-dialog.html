@@ -5,12 +5,12 @@
         <mat-icon [class]="'text-' + (data.iconColor || '[#007acc]')">
           {{ data.icon || 'help_outline' }}
         </mat-icon>
-        <h2 class="text-lg font-semibold">{{ data.title }}</h2>
+        <h2 class="text-sm font-semibold">{{ data.title }}</h2>
       </div>
 
       <!-- Message -->
       <div class="mb-6">
-        <p class="text-sm text-[#cccccc] leading-relaxed">{{ data.message }}</p>
+        <p class="text-xs text-[#cccccc] leading-relaxed">{{ data.message }}</p>
       </div>
 
       <!-- Action Buttons -->
@@ -18,13 +18,13 @@
         <button 
           type="button"
           (click)="dialogRef.close(false)"
-          class="px-4 py-2 bg-[#3c3c3c] rounded text-white hover:bg-[#4a4a4a] transition-colors">
+          class="px-4 py-2 bg-[#3c3c3c] rounded text-white hover:bg-[#4a4a4a] transition-colors text-xs">
           {{ data.cancelText || 'Cancel' }}
         </button>
         <button 
           type="button"
           (click)="dialogRef.close(true)"
-          class="px-4 py-2 bg-[#007acc] rounded text-white hover:bg-[#0098ff] transition-colors">
+          class="px-4 py-2 bg-[#c084fc] rounded text-white hover:bg-[#d8b4fe] transition-colors text-xs">
           {{ data.confirmText || 'Confirm' }}
         </button>
       </div>

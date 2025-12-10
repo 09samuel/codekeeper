@@ -42,33 +42,53 @@
 </div>
   
   <!-- Tab Bar -->
-  <div class="flex items-center bg-[#252526] border-b border-[#1e1e1e] overflow-x-auto flex-shrink-0 custom-scrollbar">
+
+  <div
+    class="flex items-center bg-[#252526] border-b border-[#1e1e1e] overflow-x-auto
+          shrink-0 custom-scrollbar h-8"
+  >
     <div class="flex min-w-max">
       @for (tab of tabs; track tab.id) {
         <div 
           (click)="selectTab(tab.id)"
           [class.bg-[#1e1e1e]]="tab.isActive"
           [class.bg-[#2d2d2d]]="!tab.isActive"
-          class="flex items-center gap-2 px-3 py-2 border-r border-[#1e1e1e] cursor-pointer hover:bg-[#2a2a2a] min-w-[120px] max-w-[200px]">
-          <span class="text-sm text-[#cccccc] truncate">{{ tab.title }}</span>
-          <button 
-            (click)="closeTab(tab.id, $event)"
-            class="ml-auto p-0.5 hover:bg-[#3e3e42] rounded">
-            <mat-icon class="!text-base text-[#858585] hover:text-white">close</mat-icon>
-          </button>
+          [class.border-t-3]="tab.isActive"
+          [class.border-t-[#c084fc]]="tab.isActive"
+          class="flex items-center gap-2 px-3 border-r border-[#1e1e1e]
+                cursor-pointer hover:bg-[#2a2a2a] min-w-[120px] max-w-[200px] h-8"
+        >
+
+          <span class="text-xs text-[#cccccc] truncate">{{ tab.title }}</span>
+            <button
+              (click)="closeTab(tab.id, $event)"
+              class="ml-auto flex items-center justify-center w-5 h-5 
+                    hover:bg-[#3e3e42] rounded"
+            >
+              <mat-icon
+                class="w-3! h-3! text-[12px]! leading-3! 
+                      text-[#858585] hover:text-white"
+              >
+                close
+              </mat-icon>
+            </button>
+
         </div>
       }
       @if (tabs.length === 0) {
-        <div class="text-sm text-[#858585] p-2 min-w-max">No files open</div>
+        <div class="text-xs text-[#858585] px-3 h-8 flex items-center min-w-max">
+          No files open
+        </div>
       }
     </div>
   </div>
+
 
   <!-- Main Content Area (Sidebar + Panel + Editor) -->
   <div class="flex flex-1 min-h-0">
     
     <!-- Sidebar -->
-    <aside class="w-12 bg-[#181818] flex flex-col justify-between items-center py-4 border-r border-[#2d2d2d] flex-shrink-0">
+    <aside class="w-12 bg-[#181818] flex flex-col justify-between items-center py-4 border-r border-[#2d2d2d] shrink-0">
       <!-- Top icons group -->
       <div class="flex flex-col items-center space-y-2">
         @for (icon of icons.slice(0, -1); track icon.name) {
@@ -77,7 +97,7 @@
             [class.text-white]="selectedPanel === icon.name && !isPanelCollapsed"
             [class.text-[#858585]]="selectedPanel !== icon.name || isPanelCollapsed"
             [class.border-r-6]="selectedPanel === icon.name && !isPanelCollapsed"
-            [class.border-[#007acc]]="selectedPanel === icon.name && !isPanelCollapsed"
+            [class.border-[#c084fc]]="selectedPanel === icon.name && !isPanelCollapsed"
             (click)="selectPanel(icon.name)">
             <mat-icon>{{ icon.icon }}</mat-icon>
           </button>
@@ -85,10 +105,13 @@
       </div>
 
       <!-- Bottom icon (logout) -->
-      <button class="w-12 h-12 flex items-center justify-center rounded hover:bg-[#2a2a2a] transition-colors relative text-[#858585]"
-           (click)="logout()">   
+      <button
+        class="w-12 h-12 flex items-center justify-center rounded hover:bg-[#2a2a2a] transition-colors relative text-[#c084fc]"
+        (click)="logout()"
+      >
         <mat-icon>{{ icons[icons.length - 1].icon }}</mat-icon>
       </button>
+
     </aside>
 
     <!-- Sidebar Panel -->
@@ -97,39 +120,37 @@
       @if (!isPanelCollapsed) {
         @switch (selectedPanel) {
           @case ('files') {
-            <app-files class="flex flex-col flex-1" (fileSelected)="onFileSelected($event)"   (fileDeleted)="onFileDeleted($event)" (fileRenamed)="onFileRenamed($event)"></app-files>">
+            <app-files class="flex flex-col flex-1" (fileSelected)="onFileSelected($event)"   (fileDeleted)="onFileDeleted($event)" (fileRenamed)="onFileRenamed($event)"></app-files>
           }
           
-          @case ('chat') {
+          <!-- @case ('chat') {
             <div class="animate-fade-in p-4">
               <h2 class="text-lg font-bold text-white">Users</h2>
               <p class="text-[#858585]">List of users</p>
             </div>
-          }
+          } -->
           
           @case ('run') {
-            <app-code-runner [editorContent]="getEditorContent()" class="flex flex-col flex-1 p-4"></app-code-runner>
+            <app-code-runner [editorContent]="getEditorContent()" class="flex flex-col flex-1 p-4 bg-[#181818]"></app-code-runner>
           }
 
           @case ('ai') {
-            <app-ai class="flex flex-col flex-1 p-4"></app-ai>
+            <app-ai class="flex flex-col flex-1 p-4 bg-[#181818]"></app-ai>
           }
 
-          
-        
-          @case ('settings') {
+          <!-- @case ('settings') {
             <div class="animate-fade-in p-4">
               <h2 class="text-lg font-bold text-white">Settings</h2>
               <p class="text-[#858585]">Configure your workspace</p>
             </div>
-          }
+          } -->
 
-          @case ('draw') {
+          <!-- @case ('draw') {
             <div class="animate-fade-in p-4">
               <h2 class="text-lg font-bold text-white">Draw</h2>
               <p class="text-[#858585]">Whiteboard</p>
             </div>
-          }
+          } -->
           
           @default {
             <div class="animate-fade-in p-4">
@@ -149,8 +170,8 @@
           @if (isEditorLoading) {
             <div class="absolute inset-0 flex items-center justify-center bg-[#1e1e1e]/80 z-20">
               <div class="flex flex-col items-center gap-3">
-                <mat-icon class="!text-4xl text-[#cccccc] animate-spin">autorenew</mat-icon>
-                <p class="text-sm text-[#cccccc]">Loading editor…</p>
+                <mat-icon class="text-4xl! text-[#cccccc] animate-spin">autorenew</mat-icon>
+                <p class="text-xs text-[#cccccc]">Loading editor…</p>
               </div>
             </div>
           }
@@ -169,7 +190,7 @@
       } @else {
         <!-- Empty Editor State -->
         <div class="h-full flex flex-col items-center justify-center text-[#858585]">
-          <mat-icon class="!text-6xl mb-4">code</mat-icon>
+          <mat-icon class="text-6xl! mb-4">code</mat-icon>
           <p class="text-lg mb-2">No file selected</p>
           <p class="text-sm">Select a file from the sidebar to start editing</p>
         </div>

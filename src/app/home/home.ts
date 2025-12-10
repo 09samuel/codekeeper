@@ -177,11 +177,11 @@ export class Home implements OnDestroy {
 
   icons = [
     { name: 'files', icon: 'insert_drive_file' },
-    { name: 'chat', icon: 'chat_bubble' },
+    //{ name: 'chat', icon: 'chat_bubble' },
     { name: 'run', icon: 'play_arrow' },
     { name: 'ai', icon: 'psychology' },
-    { name: 'draw', icon: 'draw' },
-    { name: 'settings', icon: 'settings' },
+    //{ name: 'draw', icon: 'draw' },
+    //{ name: 'settings', icon: 'settings' },
     { name: 'logout', icon: 'logout' }
   ];
 
@@ -396,7 +396,7 @@ export class Home implements OnDestroy {
   const dialogRef = this.dialog.open(ConfirmDialog, {
     data: {
       title: 'Confirm Logout',
-      message: 'Are you sure you want to logout? Any unsaved changes will be lost.',
+      message: 'Are you sure you want to logout?',
       confirmText: 'Logout',
       cancelText: 'Cancel',
       icon: 'logout',

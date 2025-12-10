@@ -20,8 +20,22 @@ import { sql } from '@codemirror/lang-sql';
 import { php } from '@codemirror/lang-php';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../services/auth-service';
-import { githubDark } from '@fsegurai/codemirror-theme-github-dark'
+import { vsCodeDark } from '@fsegurai/codemirror-theme-vscode-dark'
 
+const customFontTheme = EditorView.theme({
+  "&": {
+    fontSize: "0.75rem",
+    fontFamily: '"YourGroteskFontName", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+  },
+  ".cm-content": {
+    fontSize: "0.75rem",
+    fontFamily: '"YourGroteskFontName", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+  },
+  ".cm-gutters": {
+    fontSize: "0.75rem",
+    fontFamily: '"YourGroteskFontName", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+  }
+});
 
 @Component({
   selector: 'app-editor',
@@ -434,7 +448,8 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
 
     const extensions: any[] = [
       basicSetup,
-      githubDark,
+      vsCodeDark,
+      customFontTheme,
       yCollab(this.ytext, this.provider.awareness, { undoManager: this.undoManager })
     ];
 

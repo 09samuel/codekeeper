@@ -45,7 +45,7 @@
     "@codemirror/lang-sql": "^6.10.0",
     "@codemirror/lang-xml": "^6.1.0",
     "@codemirror/state": "^6.4.1",
-    "@fsegurai/codemirror-theme-github-dark": "^6.2.3",
+    "@fsegurai/codemirror-theme-vscode-dark": "^6.2.3",
     "codemirror": "^6.0.1",
     "jwt-decode": "^4.0.0",
     "rxjs": "^7.8.2",

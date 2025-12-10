@@ -1,65 +1,136 @@
-<div class="flex min-h-screen items-center justify-center bg-gray-100">
-  <div class="w-full max-w-sm bg-white p-8 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold mb-6 text-center">Sign in to your account</h2>
-
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
-
-      <!-- Email -->
-      <div>
-        <label for="email" class="block text-sm font-medium text-gray-700">
-          Email address
-        </label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          required
-          class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-        />
-        <p *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid"
-           class="text-sm text-red-600">
-          Please enter a valid email.
+<div class="flex min-h-screen" style="background-color: #050509;">
+  <!-- Left side - CodeKeeper Content -->
+  <div class="hidden lg:flex lg:w-[55%] px-16 py-12 items-center justify-center">
+    <div class="max-w-lg space-y-10">
+      <!-- Hero Section -->
+      <div class="space-y-4">
+        <h1 class="text-5xl font-bold" style="color: #f9fafb;">
+          CodeKeeper
+        </h1>
+        <p class=" text-2xl" style="color: #d1d5db;">
+          Real-time collaborative code editor that feels like
+          <span class=" font-semibold" style="color: #c084fc;">
+            Google Docs for developers
+          </span>
         </p>
       </div>
 
-      <!-- Password -->
-      <div>
-        <label for="password" class="block text-sm font-medium text-gray-700">
-          Password
-        </label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          required
-          class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
-        />
-        <p *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
-           class="text-sm text-red-600">
-          Password is required (min 6 characters).
+      <!-- Key Features Section -->
+      <div class="space-y-4">
+        <div class="rounded-xl p-4" style="background-color: #18181b;">
+          <h3 class="text-lg font-semibold mb-1" style="color: #f3f4f6;">
+            Live Collaboration
+          </h3>
+          <p class="text-sm" style="color: #9ca3af;">
+            <span style="color: #c084fc;">Real-time sync</span> with CRDT. See your team's cursors and changes instantly.
+          </p>
+        </div>
+
+        <div class="rounded-xl p-4" style="background-color: #18181b;">
+          <h3 class="text-lg font-semibold mb-1" style="color: #f3f4f6;">
+            AI Support
+          </h3>
+          <p class="text-sm" style="color: #9ca3af;">
+            <span style="color: #c084fc;">Assistance</span> built into your collaborative workspace.
+          </p>
+        </div>
+
+        <div class="rounded-xl p-4" style="background-color: #18181b;">
+          <h3 class="text-lg font-semibold mb-1" style="color: #f3f4f6;">
+            Smart Editor
+          </h3>
+          <p class="text-sm" style="color: #9ca3af;">
+            Syntax highlighting and support for <span style="color: #c084fc;">20+ languages</span>.
+          </p>
+        </div>
+
+        <div class="rounded-xl p-4" style="background-color: #18181b;">
+          <h3 class="text-lg font-semibold mb-1" style="color: #f3f4f6;">
+            Cloud Storage
+          </h3>
+          <p class="text-sm" style="color: #9ca3af;">
+            <span style="color: #c084fc;">Secure, backed-up</span> files you can access from anywhere.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right side - Login Form -->
+  <div class="w-full lg:w-[45%] flex items-center justify-center px-6 py-10">
+    <div
+      class="w-full max-w-sm rounded-2xl shadow-2xl"
+      style="background-color: #18181b;"
+    >
+      <div class="p-8 space-y-6">
+        <h2 class="text-2xl font-semibold text-center" style="color: #f9fafb;">
+          Sign in to your account
+        </h2>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+          <!-- Email -->
+          <div>
+            <label for="email" class="block text-sm mb-1" style="color: #e5e7eb;">
+              Email address
+            </label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              required
+              class="mt-1 w-full rounded-md px-3 py-2 text-sm"
+              style="background-color: #050509; color: #e5e7eb; border: 1px solid #27272f; outline: none;"
+            />
+            <p *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid"
+               class="text-sm mt-1" style="color: #ef4444;">
+              Please enter a valid email.
+            </p>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="password" class="block text-sm mb-1" style="color: #e5e7eb;">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              formControlName="password"
+              required
+              class="mt-1 w-full rounded-md px-3 py-2 text-sm"
+              style="background-color: #050509; color: #e5e7eb; border: 1px solid #27272f; outline: none;"
+            />
+            <p *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+               class="text-sm mt-1" style="color: #ef4444;">
+              Password is required (min 6 characters).
+            </p>
+          </div>
+
+          <!-- Forgot password link -->
+          <div class="flex justify-end">
+            <a href="#" class="text-sm font-medium cursor-pointer" style="color: #c084fc;">
+              Forgot password?
+            </a>
+          </div>
+
+          <!-- Sign in button -->
+          <button
+            type="submit"
+            class="w-full py-2.5 rounded-md font-medium text-sm shadow-md transition"
+            style="background: #c084fc; color: #f9fafb;"
+          >
+            Sign in
+          </button>
+        </form>
+
+        <!-- Register link -->
+        <p class="mt-4 text-center text-xs" style="color: #9ca3af;">
+          Don't have an account?
+          <a (click)="goToRegister()" class="font-medium cursor-pointer" style="color: #c084fc;">
+            Register
+          </a>
         </p>
       </div>
-
-      <!-- Forgot password link -->
-      <div class="flex justify-end">
-        <a href="#" class="text-sm text-blue-600 hover:underline">
-          Forgot password?
-        </a>
-      </div>
-
-      <!-- Sign in button -->
-      <button
-        type="submit"
-        class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
-      >
-        Sign in
-      </button>
-    </form>
-
-    <!-- Register link -->
-    <p class="mt-6 text-center text-sm text-gray-600">
-      Don't have an account?
-      <a (click)="goToRegister()" class="text-blue-600 hover:underline cursor-pointer">Register</a>
-    </p>
+    </div>
   </div>
 </div>

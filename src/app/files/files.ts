@@ -370,7 +370,8 @@ export class Files implements OnInit {
         placeholder: 'New name',
         defaultValue: item.title,
         confirmText: 'Rename'
-      }
+      },
+      panelClass: 'custom-dialog-container'
     });
 
     const newTitle = await firstValueFrom(dialogRef.afterClosed());

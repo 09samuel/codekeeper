@@ -4,33 +4,33 @@
   <div class="text-[#cccccc] flex flex-col flex-1 min-h-0">
     <!-- Top content -->
     <div class="flex-1 flex flex-col min-h-0">
-      <div class="mb-3 flex-shrink-0">
+      <div class="mb-3 shrink-0">
         <!-- Header with icons -->
         <div class="flex items-center justify-between mb-2">
-          <div class="text-xs font-semibold text-[#cccccc] uppercase">Files</div>
+          <div class="text-xs font-semibold text-[#c084fc] uppercase">Files</div>
           <div class="flex items-center gap-1">
             <button (click)="createNewFile()" 
                     class="p-1 hover:bg-[#2a2a2a] rounded transition-colors"
                     title="New File">
-              <mat-icon class="!text-base">note_add</mat-icon>
+              <mat-icon class="text-base!">note_add</mat-icon>
             </button>
 
             <button (click)="createNewFolder()" 
                     class="p-1 hover:bg-[#2a2a2a] rounded transition-colors"
                     title="New Folder">
-              <mat-icon class="!text-base">create_new_folder</mat-icon>
+              <mat-icon class="text-base!">create_new_folder</mat-icon>
             </button>
           </div>
         </div>
 
         @if (isLoading()) {
           <div class="flex flex-col items-center justify-center py-8 text-center">
-            <mat-icon class="!text-5xl text-[#858585] mb-3 animate-spin">refresh</mat-icon>
-            <p class="text-sm text-[#858585]">Loading files...</p>
+            <mat-icon class="text-5xl! text-[#858585] mb-3 animate-spin">refresh</mat-icon>
+            <p class="text-xs text-[#858585]">Loading files...</p>
           </div>
         } @else {
           <!-- Breadcrumbs -->
-          <div class="flex items-center gap-1 text-sm text-[#858585] mb-3" *ngIf="breadcrumbs().length > 0">
+          <div class="flex items-center gap-1 text-xs text-[#858585] mb-3" *ngIf="breadcrumbs().length > 0">
             <button (click)="currentFolderId.set(null); breadcrumbs.set([]); loadUserDocuments()" 
                     class="hover:text-white">Root</button>
             <span *ngFor="let crumb of breadcrumbs(); let last = last">
@@ -52,93 +52,137 @@
 
            <!-- Folders -->
             @for (item of folders(); track item._id) {
-              <div class="flex items-center gap-2 p-2 hover:bg-[#2a2a2a] rounded group">
-                <mat-icon class="!text-base text-[#007acc]">folder</mat-icon>
-                <span class="text-sm flex-1 truncate-name" (click)="enterFolder(item)">{{ item.title }}</span>
-                <span class="text-xs text-[#858585]">Folder</span>
-                
-                  <div class="flex items-center gap-0">
-                      <!-- Share icon button -->
-                      <div class="relative group" title="Share"> 
-                        <button (click)="$event.stopPropagation(); addCollaboratorForFolder(item)" 
-                        [disabled]="!item.isOwner" 
-                        class="p-1 rounded transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-0 disabled:group-hover:opacity-40
-                        disabled:cursor-not-allowed hover:bg-[#363636] enabled:hover:bg-[#363636]"> 
-                          <mat-icon class="!text-base text-[#858585]">person_add</mat-icon> 
-                        </button> 
-                      </div>
+              <div class="flex items-center gap-2 px-2 py-2 hover:bg-[#2a2a2a] rounded group">
 
-                    
-                      <!-- Three dots menu button -->
-                      <button 
-                        [matMenuTriggerFor]="folderMenu"
-                        (click)="$event.stopPropagation()"
-                        class="p-1 hover:bg-[#363636] rounded transition-colors opacity-0 group-hover:opacity-100" title="More options">
-                        <mat-icon class="!text-base text-[#858585]">more_vert</mat-icon>
-                      </button>
-                    </div>
-                
-                <!-- Menu for this folder -->
+                <!-- Leading icon -->
+                <div class="file-leading-icon">
+                  <mat-icon class="text-[#858585]" style="font-size: 14px; width:14px; height:14px;">
+                    folder
+                  </mat-icon>
+                </div>
+
+                <!-- Filename -->
+                <span class="text-xs flex-1 truncate-name" (click)="enterFolder(item)"> {{ item.title }} </span>
+
+                <!-- Label -->
+                <span class="text-[10px] text-[#858585]">Folder</span>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-0">
+
+                  <!-- Share -->
+                  <div class="relative group" title="Share">
+                    <button
+                      class="file-action-btn p-1 rounded transition-colors opacity-0
+                            group-hover:opacity-100 hover:bg-[#363636]
+                            disabled:opacity-0 disabled:group-hover:opacity-40
+                            disabled:cursor-not-allowed"
+                      (click)="$event.stopPropagation(); addCollaboratorForFolder(item)"
+                      [disabled]="!item.isOwner">
+
+                      <mat-icon class="text-[#858585]" style="font-size: 14px; width:14px; height:14px;">
+                        person_add
+                      </mat-icon>
+                    </button>
+                  </div>
+
+                  <!-- Menu -->
+                  <button
+                    class="file-action-btn p-1 rounded transition-colors opacity-0
+                          group-hover:opacity-100 hover:bg-[#363636]"
+                    (click)="$event.stopPropagation()"
+                    [matMenuTriggerFor]="folderMenu">
+
+                    <mat-icon class="text-[#858585]" style="font-size: 14px; width:14px; height:14px;">
+                      more_vert
+                    </mat-icon>
+
+                  </button>
+              </div>
+
+
                 <mat-menu #folderMenu="matMenu">
                   <button mat-menu-item (click)="renameItem(item)">
                     <mat-icon>edit</mat-icon>
                     <span>Rename</span>
                   </button>
-                  <button mat-menu-item (click)="deleteItem(item)" class="text-red-500">
+                  <button mat-menu-item (click)="deleteItem(item)">
                     <mat-icon>delete</mat-icon>
                     <span>Delete</span>
                   </button>
                 </mat-menu>
               </div>
+
             }
 
             <!-- Files -->
             @for (item of files(); track item._id) {
-              <div class="flex items-center gap-2 p-2 hover:bg-[#2a2a2a] rounded group">
-                <mat-icon class="!text-base text-[#dcb67a]">description</mat-icon>
-                <span class="text-sm flex-1 truncate-name" (click)="openFile(item)">{{ item.title }}</span>
-                  <div class="flex items-center gap-0">
-                    <!-- Share icon button -->
-                    
-                      <div class="relative group" title="Share"> 
-                        <button (click)="$event.stopPropagation(); addCollaboratorForFile(item)" 
-                        [disabled]="!item.isOwner" 
-                        class="p-1 rounded transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-0 disabled:group-hover:opacity-40
-                        disabled:cursor-not-allowed hover:bg-[#363636] enabled:hover:bg-[#363636]"> 
-                          <mat-icon class="!text-base text-[#858585]">person_add</mat-icon> 
-                        </button> 
-                      </div>
+              <div class="flex items-center gap-2 px-2 py-2 hover:bg-[#2a2a2a] rounded group">
+                <!-- Leading icon -->
+                <div class="file-leading-icon">
+                  <mat-icon class="text-[#858585]" style="font-size: 14px; width:14px; height:14px;">
+                    description
+                  </mat-icon>
+                </div>
 
-                    <!-- Three dots menu button -->
-                    <button 
-                      [matMenuTriggerFor]="fileMenu"
-                      (click)="$event.stopPropagation()"
-                      class="p-1 hover:bg-[#363636] rounded transition-colors opacity-0 group-hover:opacity-100" title="More options">
-                      <mat-icon class="!text-base text-[#858585]">more_vert</mat-icon>
+                <!-- Filename -->
+                <span class="text-xs flex-1 truncate-name" (click)="openFile(item)"> {{ item.title }} </span>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-0">
+
+                  <!-- Share -->
+                  <div class="relative group" title="Share">
+                    <button
+                      class="file-action-btn p-1 rounded transition-colors opacity-0
+                            group-hover:opacity-100 hover:bg-[#363636]
+                            disabled:opacity-0 disabled:group-hover:opacity-40
+                            disabled:cursor-not-allowed"
+                      (click)="$event.stopPropagation(); addCollaboratorForFile(item)"
+                      [disabled]="!item.isOwner">
+
+                      <mat-icon class="text-[#858585]" style="font-size: 14px; width:14px; height:14px;">
+                        person_add
+                      </mat-icon>
                     </button>
                   </div>
+
+                  <!-- Menu -->
+                  <button
+                    class="file-action-btn p-1 rounded transition-colors opacity-0
+                          group-hover:opacity-100 hover:bg-[#363636]"
+                    (click)="$event.stopPropagation()"
+                    [matMenuTriggerFor]="fileMenu">
+
+                    <mat-icon class="text-[#858585]" style="font-size: 14px; width:14px; height:14px;">
+                      more_vert
+                    </mat-icon>
+                  </button>
+                </div>
                               
                 <!-- Menu for this file -->
-                <mat-menu #fileMenu="matMenu">
+                <mat-menu #fileMenu="matMenu" class="dark-menu">
                   <button mat-menu-item (click)="renameItem(item)">
-                    <mat-icon>edit</mat-icon>
-                    <span>Rename</span>
+                    <mat-icon class="menu-icon">edit</mat-icon>
+                    <span class="menu-text">Rename</span>
                   </button>
-                  <button mat-menu-item (click)="deleteItem(item)" class="text-red-500">
-                    <mat-icon>delete</mat-icon>
-                    <span>Delete</span>
+
+                  <button mat-menu-item (click)="deleteItem(item)">
+                    <mat-icon class="menu-icon">delete</mat-icon>
+                    <span class="menu-text">Delete</span>
                   </button>
                 </mat-menu>
+
               </div>
             }
           } @else {
             <!-- Empty state -->
             <div class="flex flex-col items-center justify-center py-8 text-center h-full">
-              <mat-icon class="!text-5xl text-[#858585] mb-3">note_add</mat-icon>
-              <p class="text-sm text-[#858585] mb-3">No files yet</p>
+              <mat-icon class="text-5xl! text-[#858585] mb-3">note_add</mat-icon>
+              <p class="text-xs text-[#858585] mb-3">No files yet</p>
               <button (click)="createNewFile()" 
-                      class="flex items-center gap-2 text-[#007acc] hover:text-[#1177bb] text-sm font-medium">
-                <mat-icon class="!text-base">add_circle</mat-icon>
+                      class="flex items-center gap-2 text-[#c084fc] hover:text-[#d8b4fe] text-xs font-medium">
+                <mat-icon class="text-base!">add_circle</mat-icon>
                 <span>Create New File</span>
               </button>
             </div>
@@ -148,22 +192,26 @@
     </div>
     
     <!-- Button at bottom -->
-    <div class="pt-4 border-t border-[#2d2d2d] space-y-2 flex-shrink-0">
+    <div class="pt-4 border-t border-[#2d2d2d] shrink-0">
       <!-- Open Local File Button -->
-      <button (click)="fileInput.click()" 
-              class="w-full flex items-center justify-center gap-2 text-white py-2 px-4 rounded text-sm font-medium hover:bg-[#2a2a2a] transition-colors">
-        <mat-icon class="!text-base">upload_file</mat-icon>
+      <button
+        (click)="fileInput.click()" 
+        class="w-full flex items-center justify-center gap-2 text-white py-1.5 px-4 rounded text-xs font-medium hover:bg-[#2a2a2a] transition-colors leading-tight"
+      >
+        <mat-icon class="text-base!">upload_file</mat-icon>
         <span>Open Local File</span>
       </button>
-      
+
       <!-- Open Local Folder Button -->
-      <button (click)="folderInput.click()" 
-              class="w-full flex items-center justify-center gap-2 text-white py-2 px-4 rounded text-sm font-medium hover:bg-[#2a2a2a] transition-colors">
-        <mat-icon class="!text-base">folder_open</mat-icon>
+      <button
+        (click)="folderInput.click()" 
+        class="w-full flex items-center justify-center gap-2 text-white py-1.5 px-4 rounded text-xs font-medium hover:bg-[#2a2a2a] transition-colors leading-tight mt-1"
+      >
+        <mat-icon class="text-base!">folder_open</mat-icon>
         <span>Open Local Folder</span>
       </button>
     </div>
-  </div>
+
 
   <!-- Hidden file input for single file -->
   <input 
