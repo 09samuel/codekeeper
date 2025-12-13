@@ -17,7 +17,7 @@ A real-time collaborative code editor with Google Docs-like functionality, featu
 
 ### Frontend
 - **Angular v20** - Modern reactive UI framework
-- **CodeMirror 6 Editor** - Editor component
+- **CodeMirror 6 Editor** - E   ditor component
 - **Yjs** - Conflict-free replicated data types for real-time collaboration
 
 ### Backend

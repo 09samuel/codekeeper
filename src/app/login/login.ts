@@ -24,13 +24,16 @@ export class Login implements OnInit {
 
   loginForm: FormGroup = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required, Validators.minLength(6)])
+    password: new FormControl('', [Validators.required, Validators.minLength(8)])
   });
 
   http = inject(HttpClient);
   route = inject(Router);
   authService = inject(AuthService);
-  notificationService = inject(NotificationService)
+  notificationService = inject(NotificationService);
+
+  forgotPasswordEmail: string = '';
+  showForgotPasswordInput: boolean = false;
 
   async ngOnInit() {
     const token = this.authService.getAccessToken();
@@ -83,14 +86,47 @@ export class Login implements OnInit {
       }
 
     } catch (err: any) {
-      const backendMsg = err?.error?.message;
-      const message = backendMsg || 'Login failed. Please try again.';
+        const backendMsg = err?.error?.message;
+        const message = backendMsg || 'Login failed. Please try again.';
 
-      this.notificationService.error(message);
-      console.error('Login failed', err);
+        this.notificationService.error(message);
+        console.error('Login failed', err);
+      } 
+
+    }
+  }
+
+  async onForgotPassword() {
+    // Get email from the existing login form
+    const email = this.loginForm.get('email')?.value;
+    
+    if (!email) {
+      this.notificationService.error('Please enter your email address first');
+      return;
     }
 
-  }
-}
+    // Check if email is valid using the form's validation
+    if (this.loginForm.get('email')?.invalid) {
+      this.notificationService.error('Please enter a valid email address');
+      return;
+    }
 
+    try {
+      const response: any = await firstValueFrom(
+        this.http.post(`${environment.API_BASE_URL}/api/auth/forgot-password`, { email })
+      );
+
+      this.notificationService.success(
+        'If that email exists, a password reset link has been sent. Please check your inbox.'
+      );
+      console.log('Forgot password response:', response);
+
+    } catch (err: any) {
+      const backendMsg = err?.error?.error || err?.error?.message;
+      const message = backendMsg || 'Failed to send reset email. Please try again.';
+      
+      this.notificationService.error(message);
+      console.error('Forgot password failed', err);
+    }
+  }
 }
