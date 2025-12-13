@@ -60,11 +60,36 @@ export class Login implements OnInit {
       }
     }
   }
+  
 
   async onSubmit() {
-    if (this.loginForm.valid) {
-      const { email, password } = this.loginForm.value;
-      console.log('Form submitted with:', { email, password });
+    // Check if form is invalid
+    if (this.loginForm.invalid) {
+      // Mark all fields as touched to show which ones are invalid
+      this.loginForm.markAllAsTouched();
+      
+      // Show notification for validation errors
+      if (this.loginForm.get('email')?.hasError('required')) {
+        this.notificationService.error('Email is required');
+        return;
+      }
+      if (this.loginForm.get('email')?.hasError('email')) {
+        this.notificationService.error('Please enter a valid email address');
+        return;
+      }
+      if (this.loginForm.get('password')?.hasError('required')) {
+        this.notificationService.error('Password is required');
+        return;
+      }
+      if (this.loginForm.get('password')?.hasError('minlength')) {
+        this.notificationService.error('Password must be at least 8 characters');
+        return;
+      }
+      return;
+    }
+
+    const { email, password } = this.loginForm.value;
+    console.log('Form submitted with:', { email, password });
 
     try {
       const response: any = await firstValueFrom(
@@ -74,27 +99,25 @@ export class Login implements OnInit {
       if (response.accessToken && response.refreshToken) {
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
-        
         localStorage.setItem('currentUser', JSON.stringify(response.user));
 
         this.route.navigate(['/home']).then(() => {
           window.history.replaceState(null, '', '/home');
         });
       } else {
-        this.notificationService.success(response.message || 'Login failed. Please try again.');
+        this.notificationService.error(response.message || 'Login failed. Please try again.');
         console.error('Login failed', response.message);
       }
 
     } catch (err: any) {
-        const backendMsg = err?.error?.message;
-        const message = backendMsg || 'Login failed. Please try again.';
+      const backendMsg = err?.error?.message;
+      const message = backendMsg || 'Login failed. Please try again.';
 
-        this.notificationService.error(message);
-        console.error('Login failed', err);
-      } 
-
-    }
+      this.notificationService.error(message);
+      console.error('Login failed', err);
+    } 
   }
+
 
   async onForgotPassword() {
     // Get email from the existing login form

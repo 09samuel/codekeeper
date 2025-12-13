@@ -48,13 +48,33 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   async onSubmit() {
+    // Mark all fields as touched to trigger validation display
+    this.resetForm.markAllAsTouched();
+
+    // Check for required fields
+    if (this.resetForm.get('newPassword')?.hasError('required')) {
+      this.notificationService.error('New password is required');
+      return;
+    }
+
+    if (this.resetForm.get('confirmPassword')?.hasError('required')) {
+      this.notificationService.error('Please confirm your password');
+      return;
+    }
+
+    // Check password length
+    if (this.resetForm.get('newPassword')?.hasError('minlength')) {
+      this.notificationService.error('Password must be at least 8 characters long');
+      return;
+    }
+
     // Check for password mismatch
     if (this.resetForm.hasError('passwordMismatch')) {
       this.notificationService.error('Passwords do not match');
       return;
     }
 
-    // Check other validations
+    // Check for any other validation errors
     if (this.resetForm.invalid) {
       this.notificationService.error('Please fill in all required fields correctly');
       return;
@@ -83,6 +103,7 @@ export class ResetPasswordComponent implements OnInit {
       this.isSubmitting = false;
     }
   }
+
 
 
   goToLogin() {
