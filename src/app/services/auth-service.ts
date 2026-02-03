@@ -73,6 +73,38 @@ export class AuthService {
     );
   }
 
+  async register(name: string, email: string, password: string): Promise<any> {
+    try {
+      return await firstValueFrom(
+        this.http.post(`${environment.API_BASE_URL}/api/auth/register`, { name, email, password })
+      );
+    } catch (err) {
+      throw err;
+    }
+  }
+
+
+  async login(email: string, password: string): Promise<any> {
+    try {
+      const response: any = await firstValueFrom(
+        this.http.post(`${environment.API_BASE_URL}/api/auth/login`, { email, password })
+      );
+
+      if (!response?.accessToken || !response?.refreshToken) {
+        throw new Error(response?.message || 'Invalid login response');
+      }
+
+      localStorage.setItem('accessToken', response.accessToken);
+      localStorage.setItem('refreshToken', response.refreshToken);
+      localStorage.setItem('currentUser', JSON.stringify(response.user));
+
+      return response;
+
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async logout(): Promise<void> {
     const refreshToken = this.getRefreshToken();
 
@@ -86,33 +118,31 @@ export class AuthService {
     } finally {
       // Always clear tokens locally
       this.clearTokens();
-
-
     }
   }
 
   getCurrentUserId(): string | null {
-  try {
-    const currentUser = localStorage.getItem('currentUser');
-    
-    if (!currentUser) {
-      console.warn('⚠️ No currentUser found in localStorage');
+    try {
+      const currentUser = localStorage.getItem('currentUser');
+      
+      if (!currentUser) {
+        console.warn('No currentUser found in localStorage');
+        return null;
+      }
+      
+      const userData = JSON.parse(currentUser);
+      const userId = userData?._id || userData?.id;
+      
+      if (!userId) {
+        console.error('User data exists but no _id or id field found:', userData);
+        return null;
+      }
+      
+      console.log('Found user ID:', userId);
+      return userId;
+    } catch (error) {
+      console.error('Error parsing currentUser from localStorage:', error);
       return null;
     }
-    
-    const userData = JSON.parse(currentUser);
-    const userId = userData?._id || userData?.id;
-    
-    if (!userId) {
-      console.error('❌ User data exists but no _id or id field found:', userData);
-      return null;
-    }
-    
-    console.log('✅ Found user ID:', userId);
-    return userId;
-  } catch (error) {
-    console.error('❌ Error parsing currentUser from localStorage:', error);
-    return null;
   }
-}
 }

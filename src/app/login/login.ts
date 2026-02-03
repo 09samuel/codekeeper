@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 import { NotificationService } from '../services/notification-service';
 import { environment } from '../../environments/environment';
+import { signal } from '@angular/core';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,8 @@ import { environment } from '../../environments/environment';
   styleUrl: './login.css'
 })
 export class Login implements OnInit {
+  isLoading = signal(false);
+
   constructor(private router: Router) {}
 
   goToRegister() {
@@ -89,33 +92,27 @@ export class Login implements OnInit {
     }
 
     const { email, password } = this.loginForm.value;
-    console.log('Form submitted with:', { email, password });
+    
+    this.isLoading.set(true);
 
     try {
-      const response: any = await firstValueFrom(
-        this.http.post(`${environment.API_BASE_URL}/api/auth/login`, { email, password })
-      );
+      await this.authService.login(email!, password!);
 
-      if (response.accessToken && response.refreshToken) {
-        localStorage.setItem('accessToken', response.accessToken);
-        localStorage.setItem('refreshToken', response.refreshToken);
-        localStorage.setItem('currentUser', JSON.stringify(response.user));
-
-        this.route.navigate(['/home']).then(() => {
-          window.history.replaceState(null, '', '/home');
-        });
-      } else {
-        this.notificationService.error(response.message || 'Login failed. Please try again.');
-        console.error('Login failed', response.message);
-      }
+      await this.route.navigate(['/home']);
+      window.history.replaceState(null, '', '/home');
 
     } catch (err: any) {
-      const backendMsg = err?.error?.message;
-      const message = backendMsg || 'Login failed. Please try again.';
+      const message =
+        err?.error?.message ||
+        err?.message ||
+        'Login failed. Please try again.';
 
       this.notificationService.error(message);
       console.error('Login failed', err);
-    } 
+
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
 

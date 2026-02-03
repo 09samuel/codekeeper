@@ -6,6 +6,7 @@ import { AuthService } from '../services/auth-service';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../services/notification-service';
 import { environment } from '../../environments/environment';
+import { signal } from '@angular/core';
 
 @Component({
   selector: 'app-registration',
@@ -19,6 +20,7 @@ export class Registration {
   private router = inject(Router);
   private authService = inject(AuthService);
   private notification = inject(NotificationService);
+  isLoading = signal(false);
 
   registerForm: FormGroup = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(2)]),
@@ -27,7 +29,7 @@ export class Registration {
     confirmPassword: new FormControl('', [Validators.required])
   }, { validators: passwordMatchValidator });
 
-  onSubmit() {
+  async onSubmit() {
     // Mark all fields as touched
     this.registerForm.markAllAsTouched();
 
@@ -81,19 +83,22 @@ export class Registration {
 
     const { name, email, password } = this.registerForm.value;
 
-    this.http.post(`${environment.API_BASE_URL}/api/auth/register`, { name, email, password }).subscribe({
-      next: (response: any) => {
-        console.log('Registration successful', response);
-        this.notification.success('Registration successful! Verification email sent.');
-        this.router.navigate(['/login']);
-      },
-      error: (err) => {
-        const backendMsg = err?.error?.error || err?.error?.message;
-        const message = backendMsg || 'Registration failed. Please try again.';
-        this.notification.error(message);
-        console.error('Registration failed', err);
-      }
-    });
+    this.isLoading.set(true);
+
+    try {
+      await this.authService.register( name!, email!, password! );
+
+      this.notification.success('Registration successful! Verification email sent.');
+      this.router.navigate(['/login']);
+
+    } catch (err: any) {
+      const backendMsg = err?.error?.error || err?.error?.message || err?.message;
+      const message = backendMsg || 'Registration failed. Please try again.';
+      this.notification.error(message);
+      console.error('Registration failed', err);
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   goToLogin() {
