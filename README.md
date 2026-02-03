@@ -7,6 +7,7 @@ A real-time collaborative code editor with Google Docs-like functionality, featu
 ## Features
 
 - **Real-Time Collaboration** - Multiple users can edit code simultaneously with live cursor tracking and instant synchronization powered by Yjs CRDT technology
+- **Role-Based Access Control** - Assign Editor (edit and run code) or Viewer (read-only) roles to documents for secure collaboration
 - **Syntax Highlighting** - Comprehensive language support with intelligent code highlighting
 - **Code Execution** - Run code directly in the browser using Piston API with support for 50+ programming languages
 - **AI Integration** - Get coding assistance and responses through Pollinations AI integration
