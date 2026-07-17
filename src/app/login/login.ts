@@ -42,8 +42,6 @@ export class Login implements OnInit {
     const token = this.authService.getAccessToken();
 
     if (token && !this.authService.isTokenExpired(token)) {
-      console.log('Already logged in. Redirecting to /documents...');
-
       this.route.navigate(['/home']).then(() => {
           window.history.replaceState(null, '', '/home'); // removes previous entry from history
       });
@@ -52,11 +50,8 @@ export class Login implements OnInit {
     }
 
     if (token && this.authService.isTokenExpired(token)) {
-      console.log('Access token expired. Trying refresh...');
       const refreshed = await this.authService.refreshTokens();
       if (refreshed) {
-        console.log('Token refreshed. Redirecting to /home...');
-
         this.route.navigate(['/home']).then(() => {
           window.history.replaceState(null, '', '/home'); // removes previous entry from history
         });
@@ -139,7 +134,6 @@ export class Login implements OnInit {
       this.notificationService.success(
         'If that email exists, a password reset link has been sent. Please check your inbox.'
       );
-      console.log('Forgot password response:', response);
 
     } catch (err: any) {
       const backendMsg = err?.error?.error || err?.error?.message;

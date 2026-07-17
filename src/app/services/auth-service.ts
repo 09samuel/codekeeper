@@ -138,7 +138,6 @@ export class AuthService {
         return null;
       }
       
-      console.log('Found user ID:', userId);
       return userId;
     } catch (error) {
       console.error('Error parsing currentUser from localStorage:', error);

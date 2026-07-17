@@ -25,12 +25,10 @@ export class CollaboratorStoreService {
 
   setCurrentDocument(documentId: string) {
     this.currentDocumentId = documentId;
-    console.log('📄 Store context set to document:', documentId);
     
     // Emit the collaborators for this document
     const collaborators = this.collaboratorsByDocument.get(documentId) || [];
     this.collaboratorsSubject.next(collaborators);
-    console.log(`📋 Loaded ${collaborators.length} collaborators for document ${documentId}`);
   }
 
   setAll(collaborators: Collaborator[], documentId?: string) {
@@ -48,13 +46,9 @@ export class CollaboratorStoreService {
     if (docId === this.currentDocumentId) {
       this.collaboratorsSubject.next(collaborators);
     }
-    
-    console.log(`✓ Loaded ${collaborators.length} collaborators for document ${docId}`);
   }
 
   clear() {
-    console.log('🧹 Clearing collaborators store for document:', this.currentDocumentId);
-    
     if (this.currentDocumentId) {
       this.collaboratorsByDocument.delete(this.currentDocumentId);
     }
@@ -76,8 +70,6 @@ export class CollaboratorStoreService {
     const exists = current.find(c => c._id === collaborator._id);
 
     if (!exists) {
-      console.log(`➕ Adding collaborator ${collaborator.email} to document ${docId}`);
-      
       const updated = [...current, collaborator];
       this.collaboratorsByDocument.set(docId, updated);
       
@@ -88,20 +80,15 @@ export class CollaboratorStoreService {
       
       // Emit event with document ID
       this.collaboratorAddedSubject.next({ ...collaborator, documentId: docId });
-      console.log('✅ collaboratorAdded$ event emitted for:', collaborator.email);
-    } else {
-      console.log(`⚠️ Collaborator ${collaborator.email} already exists in document ${docId}`);
     }
   }
 
   remove(collaboratorId: string, documentId: string) {
   const current = this.collaboratorsByDocument.get(documentId) || [];
   const filtered = current.filter(c => c._id !== collaboratorId);
-
   const existed = current.length !== filtered.length;
 
   if (existed) {
-    console.log(`➖ Removing collaborator ${collaboratorId} from document ${documentId}`);
     this.collaboratorsByDocument.set(documentId, filtered);
 
     if (documentId === this.currentDocumentId) {
@@ -109,11 +96,9 @@ export class CollaboratorStoreService {
     }
 
     this.collaboratorRemovedSubject.next({ userId: collaboratorId, documentId });
-    console.log('✅ collaboratorRemoved$ event emitted (removed existing)');
     return;
   }
 
-  console.log(`⚠️ Attempted to remove collaborator ${collaboratorId} from document ${documentId} but it was not present locally — still emitting removed event`);
   this.collaboratorRemovedSubject.next({ userId: collaboratorId, documentId });
 }
 
@@ -137,8 +122,6 @@ export class CollaboratorStoreService {
     if (docId === this.currentDocumentId) {
       this.collaboratorsSubject.next(updated);
     }
-    
-    console.log(`🔄 Updated permission for ${collaboratorId} in document ${docId} to ${permission}`);
   }
 
   getUserPermission$(userId: string, documentId: string): Observable<'edit' | 'view'>{

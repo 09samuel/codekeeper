@@ -53,7 +53,6 @@ export class RuntimeService {
         
         this.languageOptions.set(options);
         this.loaded = true;
-        console.log(`✓ Loaded ${options.length} language runtimes`);
       }
     } catch (error: any) {
       const errorMsg = error?.error?.error || error?.error?.message || 'Failed to load runtimes';

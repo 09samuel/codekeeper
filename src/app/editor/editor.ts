@@ -88,37 +88,18 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
 
   ngAfterViewInit() {
     this.currentUserId = this.authService.getCurrentUserId();
-    console.log('👤 Current user ID:', this.currentUserId);
 
     //  Subscribe to collaboratorRemoved$ with correct event structure
     this.removalSubscription = this.collaboratorStore.collaboratorRemoved$
       .subscribe(event => {
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('🧾 EDITOR RECEIVED collaboratorRemoved$ event');
-        console.log('   Event:', event);
-        console.log('   event._id:', event?.userId);
-        console.log('   event.documentId:', event?.documentId);
-        console.log('   Current editor docId:', this.documentId);
-        console.log('   Current userId:', this.currentUserId);
-        console.log('   Document owner:', this.documentOwner?._id);
-
         if (!event || !event.documentId) {
-          console.log('⚠️ collaboratorRemoved$ event missing documentId or is falsy');
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           return;
         }
 
         // 1) If any collaborator removed for the open document -> refresh metadata
-        console.log('🔍 Checking if event is for this document...');
-        console.log('   event.documentId === this.documentId?', event.documentId === this.documentId);
-        
         if (event.documentId === this.documentId) {
-          console.log('✓ YES - This is for the currently open document');
-          console.log('🔄 Refreshing permissions/collabs for this document');
-          
           this.docService.getDocumentPermission(this.documentId).subscribe({
             next: (res) => {
-              console.log('🔁 Refreshed permission from backend:', res.permission);
               this.userPermission = (this.currentUserId === this.documentOwner?._id) ? 'edit' : res.permission;
               this.applyPermissionToEditor(this.userPermission);
             },
@@ -127,26 +108,12 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
         }
 
         // 2) If current user removed from this document -> close editor
-        console.log('🔍 Checking if CURRENT USER was removed...');
-        console.log('   event._id:', event.userId);
-        console.log('   currentUserId:', this.currentUserId);
-        console.log('   event._id === currentUserId?', event.userId === this.currentUserId);
-        console.log('   event.documentId === this.documentId?', event.documentId === this.documentId);
-        
         const shouldCloseEditor = event.userId === this.currentUserId && event.documentId === this.documentId;
-        console.log('   → Should close editor?', shouldCloseEditor);
         
         if (shouldCloseEditor) {
-          console.log('⛔⛔⛔ CURRENT USER REMOVED FROM THIS DOCUMENT ⛔⛔⛔');
-          console.log('   Cleaning up editor...');
           this.cleanupEditor();
-          console.log('   Redirecting to /home...');
           window.location.href = '/home';
-        } else {
-          console.log('ℹ️ Not closing editor (user not removed or different document)');
         }
-        
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       }, err => {
         console.error('❌ collaboratorRemoved$ subscription error in editor:', err);
       });
@@ -154,7 +121,6 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
     if (this.documentId && this.provider && this.ydoc) {
       this.docService.getDocumentPermission(this.documentId).subscribe({
         next: async (res) => { 
-          console.log('📋 Initial permission from backend:', res.permission);
           this.userPermission = res.permission;
 
           if (this.currentUserId === this.documentOwner?._id) {
@@ -181,8 +147,6 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['documentId'] && !changes['documentId'].firstChange) {
-      console.log('📄 Document changed, cleaning up and re-initializing...');
-      
       this.cleanupEditor();
       this.unsubscribeFromPermissionChanges();
       
@@ -216,7 +180,6 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy() {
-    console.log('🧹 Editor component destroying, cleaning up...');
     this.cleanupEditor();
     this.unsubscribeFromPermissionChanges();
     
@@ -224,7 +187,6 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
     if (this.removalSubscription) {
       this.removalSubscription.unsubscribe();
       this.removalSubscription = undefined;
-      console.log('🔕 Unsubscribed from collaboratorRemoved$');
     }
   }
 
@@ -233,27 +195,18 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
       console.warn('⚠️ Cannot subscribe to permissions: No current user ID found');
       return;
     }
-
-    console.log('🔔 Subscribing to permission changes for user:', this.currentUserId);
     
     this.permissionSubscription = this.collaboratorStore
       .getUserPermission$(this.currentUserId, this.documentId)
       .subscribe({
         next: (permission) => {
-          console.log('🔄 Real-time permission update received:', permission);
-          console.log('   Current permission:', this.userPermission);
-          console.log('   New permission:', permission);
-
           if (this.currentUserId === this.documentOwner?._id) {
             permission = 'edit';
           }
           
           if (this.userPermission !== permission) {
-            console.log('✨ Permission changed! Updating editor...');
             this.userPermission = permission;
             this.applyPermissionToEditor(permission);
-          } else {
-            console.log('ℹ️ Permission unchanged, no action needed');
           }
         },
         error: (err) => {
@@ -278,10 +231,8 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
       });
       
       if (isReadOnly) {
-        console.log('🔒 ✅ Editor LOCKED (view-only mode)');
         this.showNotification('Editor is now read-only');
       } else {
-        console.log('🔓 ✅ Editor UNLOCKED (edit mode)');
         this.showNotification('You now have edit access');
       }
     } catch (error) {
@@ -293,12 +244,10 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
     if (this.permissionSubscription) {
       this.permissionSubscription.unsubscribe();
       this.permissionSubscription = undefined;
-      console.log('🔕 Unsubscribed from permission changes');
     }
   }
 
   private showNotification(message: string) {
-    console.log('📢 Notification:', message);
   }
 
   private getLanguageFromFilename(filename: string) {
@@ -474,13 +423,9 @@ export class Editor implements AfterViewInit, OnChanges, OnDestroy {
       state,
       parent: this.editorContainer.nativeElement
     });
-    
-    console.log(`✅ Editor initialized in ${this.userPermission} mode`);
   }
 
   setReadOnly(readOnly: boolean) {
-    console.log('📝 Manual setReadOnly called with:', readOnly);
-    
     if (this.editorView) {
       this.userPermission = readOnly ? 'view' : 'edit';
       this.applyPermissionToEditor(this.userPermission);

@@ -67,77 +67,25 @@ export class Files implements OnInit {
 
   constructor() {
     const currentUserId = this.auth.getCurrentUserId();
-    
-    console.log('🎯 Files component initialized');
-    console.log('   Current userId:', currentUserId);
-    console.log('   userId type:', typeof currentUserId);
-    console.log('   userId length:', currentUserId?.length);
 
     merge(
       // Collaborator added for current user
       this.collabStore.collaboratorAdded$.pipe(
-        tap((e) => {
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          console.log('📨 ADDED EVENT RECEIVED');
-          console.log('   Raw event:', e);
-          console.log('   event._id:', e?._id);
-          console.log('   event._id type:', typeof e?._id);
-          console.log('   event.documentId:', e?.documentId);
-        }),
         filter((e) => {
-          console.log('🔍 ADDED FILTER CHECK:');
-          console.log('   e exists?', !!e);
-          console.log('   e._id:', e?._id);
-          console.log('   currentUserId:', currentUserId);
-          console.log('   e._id === currentUserId?', e?._id === currentUserId);
-          console.log('   !!e.documentId?', !!e?.documentId);
-          
-          const isValid = e && e._id === currentUserId && !!e.documentId;
-          console.log('   → FINAL RESULT:', isValid);
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          return isValid;
-        }),
-        tap(() => console.log('✅ Collaborator ADDED - triggering refresh'))
+          return e && e._id === currentUserId && !!e.documentId;
+        })
       ),
 
       // Collaborator removed for current user
       this.collabStore.collaboratorRemoved$.pipe(
-        tap((e) => {
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          console.log('📨 REMOVED EVENT RECEIVED');
-          console.log('   Raw event:', e);
-          console.log('   event._id:', e?.userId);
-          console.log('   event._id type:', typeof e?.userId);
-          console.log('   event._id length:', e?.userId?.length);
-          console.log('   event.documentId:', e?.documentId);
-        }),
         filter((e) => {
-          console.log('🔍 REMOVED FILTER CHECK:');
-          console.log('   e exists?', !!e);
-          console.log('   e._id:', e?.userId);
-          console.log('   currentUserId:', currentUserId);
-          console.log('   e._id === currentUserId?', e?.userId === currentUserId);
-          console.log('   Strict equality:', e?.userId, '===', currentUserId, '→', e?.userId === currentUserId);
-          console.log('   !!e.documentId?', !!e?.documentId);
-          
-          // Additional debug: check if they're "equal" in other ways
-          if (e?.userId && currentUserId) {
-            console.log('   String comparison:', String(e.userId) === String(currentUserId));
-            console.log('   Trimmed comparison:', e.userId.trim() === currentUserId.trim());
-          }
-          
-          const isValid = e && e.userId === currentUserId && !!e.documentId;
-          console.log('   → FINAL RESULT:', isValid);
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          return isValid;
-        }),
-        tap((e) => console.log('✅ Collaborator REMOVED - triggering refresh, docId:', e.documentId))
+          return e && e.userId === currentUserId && !!e.documentId;
+        })
       )
     )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          console.log('🔄 Files list refresh triggered via RxJS');
           this.loadUserDocuments();
         },
         error: (err) => {
@@ -148,7 +96,6 @@ export class Files implements OnInit {
       effect(() => {
       const refreshCount = this.docService.refresh$();
       if (refreshCount > 0) {
-        console.log('🔄 Document service triggered refresh (count:', refreshCount, ')');
         this.loadUserDocuments();
       }
     }, { allowSignalWrites: true });
@@ -162,7 +109,6 @@ export class Files implements OnInit {
   // DOCUMENT LOADING
   // =====================================================================================
   async loadUserDocuments(): Promise<void> {
-    console.log('📂 Loading user documents...');
     this.isLoading.set(true);
 
     try {
@@ -184,8 +130,6 @@ export class Files implements OnInit {
 
       await Promise.all(ownershipChecks);
       this.documents.update((d) => [...d]);
-      
-      console.log('✅ Loaded', docs.length, 'documents');
     } catch (err) {
       console.error('❌ Error loading documents:', err);
       this.documents.set([]);
@@ -287,8 +231,6 @@ export class Files implements OnInit {
         })
       );
 
-      console.log('[Files] Created document:', doc._id, 'S3 key:', doc.s3Key);
-
   
       await this.waitForDocumentReady(doc._id);
 
@@ -299,8 +241,6 @@ export class Files implements OnInit {
         title: doc.title,
         content: ''
       });
-
-      console.log('[Files] File ready and emitted:', doc._id);
     } catch (error) {
       console.error('[Files] Error creating file:', error);
       this.notification.error('Failed to create file');
@@ -343,11 +283,9 @@ export class Files implements OnInit {
         );
         
         if (doc.s3Key && doc.contentUrl) {
-          console.log('[Files] Document ready:', docId);
           return;
         }
         
-        console.log(`[Files] Waiting for document ${docId} (attempt ${i + 1}/${maxRetries})`);
         await new Promise(resolve => setTimeout(resolve, 500));
       } catch (err) {
         if (i === maxRetries - 1) throw err;
@@ -512,8 +450,6 @@ export class Files implements OnInit {
           _id: newDoc._id,
           title: newDoc.title
         });
-        
-        console.log(`✓ Local file "${file.name}" uploaded successfully`);
       } catch (err) {
         console.error('✗ Error uploading local file:', err);
         
@@ -546,7 +482,6 @@ export class Files implements OnInit {
       }
       
       const totalSizeMB = (totalSize / (1024 * 1024)).toFixed(2);
-      console.log(`📦 Total folder size: ${totalSizeMB} MB (${files.length} files)`);
       
       const maxSize = 100 * 1024 * 1024; // 100 MB
       if (totalSize > maxSize) {
@@ -567,14 +502,10 @@ export class Files implements OnInit {
           })
         );
         
-        console.log(`✓ Created root folder: ${rootFolderName}`);
-        
         const folderStructure = this.buildFolderStructure(files);
         await this.uploadFolderStructure(folderStructure, rootFolder._id, rootFolderName);
         
         await this.loadUserDocuments();
-        
-        console.log(`✓ Folder uploaded successfully`);
       } catch (err) {
         console.error('✗ Error uploading folder:', err);
         
@@ -648,7 +579,6 @@ export class Files implements OnInit {
             );
             folderMap.set(currentPath, folder._id);
             currentParentId = folder._id;
-            console.log(`✓ Created folder: ${currentPath}`);
           } catch (err) {
             console.error(`✗ Error creating folder ${currentPath}:`, err);
             throw err;
@@ -669,7 +599,6 @@ export class Files implements OnInit {
               type: 'file'
             })
           );
-          console.log(`✓ Uploaded file: ${folderPath}/${file.name}`);
         } catch (err) {
           console.error(`✗ Error uploading file ${file.name}:`, err);
           throw err;

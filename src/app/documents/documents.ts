@@ -15,7 +15,6 @@ export class DocumentsComponent {
   createNewDocument() {
     this.docService.createDocument({ title: 'Untitled', content: '' }).subscribe({
       next: (saved) => {
-        console.log('Created doc:', saved);
         // Navigate to editor with docId
         this.router.navigate(['/editor', saved._id]);
       },

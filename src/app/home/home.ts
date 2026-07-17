@@ -85,7 +85,6 @@ export class Home implements OnDestroy {
     const token = localStorage.getItem('accessToken')!;
     if (token) {
       // Connect global WebSocket once on init and keep it connected
-      console.log('🌐 Connecting global collaborator WebSocket...');
       this.collabRealtime.connectGlobal(token);
     }
     this.subscribeToCollaboratorRemovals();
@@ -106,7 +105,6 @@ export class Home implements OnDestroy {
     this.disconnectYjs();
     
     // Only disconnect global WebSocket on component destroy (logout)
-    console.log('🌐 Disconnecting global collaborator WebSocket...');
     this.collabRealtime.disconnect();
   }
 
@@ -128,8 +126,6 @@ export class Home implements OnDestroy {
   }
 
   disconnectYjs() {
-    console.log('🧹 Disconnecting Yjs (but keeping global collab WebSocket alive)');
-    
     // Remove awareness listener
     if (this.wsProvider && this.awarenessChangeHandler) {
       this.wsProvider.awareness.off('change', this.awarenessChangeHandler);
@@ -236,7 +232,6 @@ export class Home implements OnDestroy {
     const tabToClose = this.tabs.find(tab => tab.documentId === documentId);
     if (tabToClose) {
       this.tabService.closeTab(tabToClose.id);
-      console.log(`✓ Closed tab for deleted file ${documentId}`);
       
       if (this.currentDocumentId === documentId) {
         this.disconnectYjs();
@@ -246,12 +241,9 @@ export class Home implements OnDestroy {
 
   onFileRenamed(event: { _id: string; newTitle: string }) {
     this.tabService.renameTab(event._id, event.newTitle);
-    console.log(`✓ Updated tab title to "${event.newTitle}"`);
   }
 
   connectToDocument(documentId: string) {
-    console.log(`Connecting to document: ${documentId}`);
-    
     this.isEditorLoading = true; 
     
     this.disconnectYjs();
@@ -285,8 +277,6 @@ export class Home implements OnDestroy {
         this.collaboratorStore.setCurrentDocument(documentId);
         this.collaboratorStore.setAll(response.collaborators, documentId);
         this.documentOwner = response.owner; 
-        console.log('✓ Loaded initial collaborators:', response.collaborators);
-        console.log('✓ Document owner:', response.owner);
       },
       error: (error) => {
         console.error('Failed to load initial collaborators:', error);
@@ -303,30 +293,22 @@ export class Home implements OnDestroy {
       avatar: currentUser?.avatar || this.generateAvatarUrl(currentUser?.name || 'User')
     });
 
-    console.log('Set my awareness state as:', this.wsProvider.awareness.getLocalState());
 
     this.wsProvider.on('status', ({ status }: { status: string }) => {
-      console.log(`[WebSocket] Status: ${status}`);
-      
       if (status === 'connected') {
-        console.log('✓ Successfully connected to Yjs server');
       } else if (status === 'disconnected') {
-        console.log('✗ Disconnected from Yjs server');
       }
     });
 
     if (!this.wsProvider) return;
 
     this.wsProvider.on('connection-close', async (event, provider) => {
-      console.log('[WebSocket] Connection closed:', event?.code, event?.reason);
-
       if (event?.code === 1008 || event?.code === 4401) {
         console.error('Authentication failed. Token may be invalid or expired.');
         this.wsProvider!.shouldConnect = false;
 
         const refreshed = await this.authService.refreshTokens();
         if (refreshed) {
-          console.log('Token refreshed, reconnecting...');
           this.connectToDocument(documentId);
         } else {
           console.error('Token refresh failed, redirecting to login');
@@ -352,16 +334,6 @@ export class Home implements OnDestroy {
     updated: number[],
     removed: number[]
   }) {
-    if (changes.added.length > 0) {
-      console.log('Users joined:', changes.added);
-    }
-    if (changes.updated.length > 0) {
-      console.log('Users updated:', changes.updated);
-    }
-    if (changes.removed.length > 0) {
-      console.log('Users left:', changes.removed);
-    }
-    
     this.updateActiveUsers();
   }
 
@@ -370,15 +342,6 @@ export class Home implements OnDestroy {
     
     const awareness = this.wsProvider.awareness;
     const states = Array.from(awareness.getStates().entries());
-    
-    console.log('=== AWARENESS DEBUG ===');
-    console.log('My client ID:', awareness.clientID);
-    console.log('Total clients:', states.length);
-    
-    states.forEach(([clientId, state]) => {
-      const isMe = clientId === awareness.clientID;
-      console.log(`${isMe ? '→ ME ' : '  Other'} Client ${clientId}:`, state['user']?.name || 'No name');
-    });
     
     this.activeUsers = states
       .filter(([clientId, state]) => {
@@ -391,9 +354,6 @@ export class Home implements OnDestroy {
         name: state['user'].name,
         avatar: state['user'].avatar || this.generateAvatarUrl(state['user'].name)
       }));
-    
-    console.log('Other active users to display:', this.activeUsers);
-    console.log('=== END DEBUG ===');
   }
 
   getRemainingUsersTooltip(): string {
@@ -435,7 +395,6 @@ export class Home implements OnDestroy {
         this.disconnectYjs();
         
         // Explicitly disconnect global WebSocket on logout
-        console.log('🌐 Disconnecting global collaborator WebSocket on logout...');
         this.collabRealtime.disconnect();
         
         await this.authService.logout();
@@ -455,22 +414,16 @@ export class Home implements OnDestroy {
     this.collaboratorStore.collaboratorRemoved$
       .pipe(filter(event => !!event))
       .subscribe(event => {
-        console.log('🏠 Home received collaboratorRemoved$ event:', event);
-
         const { userId: removedUserId, documentId } = event!;
 
         // If some other user was removed, do nothing.
         if (removedUserId !== this.currentUserId) {
-          console.log('   → Different user removed, ignoring');
           return;
         }
-
-        console.log('   → CURRENT USER was removed from document:', documentId);
 
         // If the removed document is currently open → close it
         const openTab = this.tabs.find(t => t.documentId === documentId);
         if (openTab) {
-          console.log(`⚠️ You lost access to document ${documentId}. Closing tab.`);
           this.notification.error('Your access to a document was revoked. The tab will be closed.');
           this.tabService.closeTab(openTab.id);
 
