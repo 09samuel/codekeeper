@@ -4,6 +4,8 @@ A real-time collaborative code editor with Google Docs-like functionality, featu
 
 🔗 **Live Demo:** https://codekeeper-nu.vercel.app/
 
+ 🎥 **Demo Video:** https://drive.google.com/file/d/1Um7e37ChdT5ik6MXhxdgSgnfcvnw2ppE/view?usp=sharing
+
 ## Features
 
 - **Real-Time Collaboration** - Multiple users can edit code simultaneously with live cursor tracking and instant synchronization powered by Yjs CRDT technology
